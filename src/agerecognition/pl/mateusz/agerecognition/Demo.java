@@ -23,8 +23,8 @@ class DetectFaceDemo {
 
         // Create a face detector from the cascade file in the resources
         // directory.
-        CascadeClassifier faceDetector = new CascadeClassifier(resourcesPath + "/lbpcascade_frontalface.xml");
-        Mat image = Imgcodecs.imread(resourcesPath + "/lena.png");
+        CascadeClassifier faceDetector = new CascadeClassifier(resourcesPath + "/xml/lbpcascade_frontalface.xml");
+        Mat image = Imgcodecs.imread(resourcesPath + "/testImages/lena.png");
         Imshow.show(image,"Cudowna Lena");
 
         // Detect faces in the image.
@@ -49,7 +49,6 @@ class DetectFaceDemo {
 public class Demo {
     public static void main(String[] args) {
         System.out.println("Hello, OpenCV");
-
         // Load the native library.
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         new DetectFaceDemo().run();
