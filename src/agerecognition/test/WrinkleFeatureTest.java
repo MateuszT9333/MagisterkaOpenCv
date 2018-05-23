@@ -7,18 +7,14 @@ import org.opencv.imgcodecs.Imgcodecs;
 import pl.mateusz.agerecognition.Imshow;
 import pl.mateusz.agerecognition.WrinkleFeature;
 
-import java.io.File;
-import java.util.Scanner;
-
-import static org.junit.Assert.*;
-
 public class WrinkleFeatureTest {
 
     final String resourcesPath = "src/resources/";
     final String testImages = resourcesPath + "testImages/";
     final String trainingImages = resourcesPath + "trainingImages/";
     final String lenaPath = testImages + "lena.png";
-    final String facetPath = testImages + "facet.jpg";
+    final String ryjek = testImages + "ryjek.jpg";
+    final String monalisa = testImages + "monalisa.jpg";
 
     private Mat croppedFace = null;
 
@@ -28,24 +24,24 @@ public class WrinkleFeatureTest {
 
     @Test
     public void faceDetectorTest() throws InterruptedException {
-        showImage(lenaPath, "Oryginal");
-        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(lenaPath));
+        showImage(ryjek, "Oryginal");
+        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
         Imshow.show(croppedFace, "Cropped face");
         Thread.sleep(20000);
     }
     @Test
     public void detectEyesMouthNoseTest() throws InterruptedException {
-        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(facetPath));
+        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(monalisa));
         Mat eyesMouthNose = WrinkleFeature.detectEyesMouthNose(croppedFace);
         Imshow.show(eyesMouthNose, "Detected features");
         Thread.sleep(20000);
     }
     @Test
     public void detectEdgesTest() throws InterruptedException {
-
-        Mat edges = WrinkleFeature.detectEdges(Imgcodecs.imread(lenaPath));
+        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
+        Mat edges = WrinkleFeature.detectEdges(croppedFace);
         Imshow.show(edges);
-        Thread.sleep(10000);
+        Thread.sleep(20000);
     }
 
     void showImage(String imagePath, String frameTitle){

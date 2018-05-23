@@ -4,6 +4,7 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.objdetect.Objdetect;
 
 public class WrinkleFeature {
     final static String resourcesPath = "src/resources/";
@@ -13,7 +14,7 @@ public class WrinkleFeature {
     final static String lbpcascadeFrontalFaceDetectorPath = xmlPath + "lbpcascade_frontalface.xml";
     final static String mouthDetectorPath = xmlPath + "haarcascade_mouth.xml";
     final static String noseDetectorPath = xmlPath + "haarcascade_nose.xml";
-    final static String eyeDetectorPath = xmlPath + "haarcascade_eye.xml";
+    final static String eyeDetectorPath = xmlPath + "haarcascade_eye_big.xml";
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -38,14 +39,14 @@ public class WrinkleFeature {
     public static Mat detectEyesMouthNose(Mat croppedImage) {
         Mat tempCroppedImage = croppedImage;
         //Detect eyes
-       // tempCroppedImage = getMatWithDetectedObjects(eyeDetectorPath, tempCroppedImage, null,
-       //         false);
+        tempCroppedImage = getMatWithDetectedObjects(eyeDetectorPath, tempCroppedImage, null,
+               false);
         //Detect nose
-       // tempCroppedImage = getMatWithDetectedObjects(noseDetectorPath, tempCroppedImage, null,
-      //         false);
+        tempCroppedImage = getMatWithDetectedObjects(noseDetectorPath, tempCroppedImage, null,
+              false);
         //Detect mouth
-        tempCroppedImage = getMatWithDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
-                false);
+//        tempCroppedImage = getMatWithDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
+//                false);
         return tempCroppedImage;
 
     }
@@ -67,7 +68,11 @@ public class WrinkleFeature {
         //Creating Mat object from image passed as parameter
         MatOfRect objectDetections = new MatOfRect();
         //Detecting objects
-        cascadeClassifier.detectMultiScale(tempImage, objectDetections);
+       // cascadeClassifier.detectMultiScale(tempImage, objectDetections);
+        cascadeClassifier.detectMultiScale(tempImage, objectDetections,1.1, 10,
+                Objdetect.CASCADE_FIND_BIGGEST_OBJECT
+                , new org.opencv.core.Size(30, 30),
+                new org.opencv.core.Size());
 
         if (message == null) {
             System.out.println(String.format("Detected %s objects", objectDetections.toArray().length));
@@ -83,33 +88,47 @@ public class WrinkleFeature {
 
         //Croping an image to detected object
         if (cropImageToDetectedObject) {
-            Rect croppedFaceRectangle = null;
-            for (Rect rect : objectDetections.toArray()) {
-                Imgproc.rectangle(tempImage, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
-                        rect.height), new Scalar(0, 0, 0));
-                croppedFaceRectangle = new Rect(rect.x, rect.y, rect.width, rect.height);
-            }
-            Mat croppedImage = new Mat(tempImage, croppedFaceRectangle);
-            return croppedImage;
+            return getCroppedMat(tempImage, objectDetections);
         } else {
             //Drawing a black rectangle over detected object
-            for (Rect rect : objectDetections.toArray()) {
-                Imgproc.rectangle(tempImage, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
-                        rect.height), new Scalar(0, 0, 0));
-            }
-            return tempImage;
+            return drawARectangleInMat(tempImage, objectDetections);
         }
 
     }
+
+    private static Mat drawARectangleInMat(Mat tempImage, MatOfRect objectDetections) {
+        for (Rect rect : objectDetections.toArray()) {
+            Imgproc.rectangle(tempImage, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
+                    rect.height), new Scalar(0, 0, 0));
+        }
+        return tempImage;
+    }
+
+    private static Mat getCroppedMat(Mat tempImage, MatOfRect objectDetections) {
+        Rect croppedFaceRectangle = null;
+        for (Rect rect : objectDetections.toArray()) {
+            Imgproc.rectangle(tempImage, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
+                    rect.height), new Scalar(0, 0, 0));
+            croppedFaceRectangle = new Rect(rect.x, rect.y, rect.width, rect.height);
+        }
+        Mat croppedImage = new Mat(tempImage, croppedFaceRectangle);
+        return croppedImage;
+    }
+
     public static Mat makeGrayImage(Mat oryginal){
         Mat gray = new Mat();
         Imgproc.cvtColor(oryginal, gray, Imgproc.COLOR_BGR2GRAY);
         return gray;
     }
+
+    /**
+     *
+     * @param oryginal - must be gray image
+     * @return image with detected edges
+     */
     public static Mat detectEdges(Mat oryginal){
         Mat canny = new Mat();
-        Mat gray = makeGrayImage(oryginal);
-        Imgproc.Canny(gray, canny, 10, 100);
+        Imgproc.Canny(oryginal, canny, 10, 100);
         return canny;
     }
 
