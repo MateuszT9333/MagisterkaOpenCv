@@ -5,22 +5,20 @@
  * Make sure OpenCV Java is in your Build Path
  * Usage :
  * -------
- * pl.mateusz.agerecognition.Imshow ims = new pl.mateusz.agerecognition.Imshow("Title");
+ * pl.mateusz.agerecognition.utils.Imshow ims = new pl.mateusz.agerecognition.utils.Imshow("Title");
  * ims.showImage(Mat image);
  * Check Example for usage with Webcam Live Video Feed
  */
-package pl.mateusz.agerecognition;
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.WindowConstants;
+package pl.mateusz.agerecognition.utils;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 
 
 public class Imshow {

@@ -1,3 +1,7 @@
+/**
+ * @author Mateusz Trzeciak
+ * Paths to files in resources
+ */
 package pl.mateusz.agerecognition.utils;
 
 public class Paths {

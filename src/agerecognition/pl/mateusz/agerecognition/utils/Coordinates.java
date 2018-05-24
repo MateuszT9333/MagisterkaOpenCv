@@ -1,3 +1,6 @@
+/**
+ * @author Mateusz Trzeciak
+ */
 package pl.mateusz.agerecognition.utils;
 
 public class Coordinates {
