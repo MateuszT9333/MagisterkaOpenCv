@@ -35,6 +35,7 @@ public class WrinkleFeatureTest {
         croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
         Mat eyesMouthNose = WrinkleFeature.detectPairOfEyesAndNose(croppedFace);
         System.out.println(WrinkleFeature.mapOfDetectedObjects.toString());
+        System.out.println(WrinkleFeature.distanseBetweenEyes);
        // Imshow.show(eyesMouthNose, "Detected features");
       //  Thread.sleep(20000);
     }
