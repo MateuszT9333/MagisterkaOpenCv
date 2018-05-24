@@ -31,7 +31,7 @@ public class WrinkleFeatureTest {
         Thread.sleep(20000);
     }
     @Test
-    public void detectEyesNoseTest() throws InterruptedException {
+    public void detectPairOfEyesNoseTest() throws InterruptedException {
         croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
         Mat eyesMouthNose = WrinkleFeature.detectPairOfEyesAndNose(croppedFace);
         System.out.println(WrinkleFeature.mapOfDetectedObjects.toString());
@@ -43,8 +43,9 @@ public class WrinkleFeatureTest {
         croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
         Mat eyes = WrinkleFeature.detectEyes(croppedFace);
         System.out.println(WrinkleFeature.mapOfDetectedObjects.toString());
-        Imshow.show(eyes);
-        Thread.sleep(20000);
+        System.out.println("Distanse between eyes " + WrinkleFeature.distanseBetweenEyes);
+   //     Imshow.show(eyes);
+      //  Thread.sleep(20000);
     }
     @Test
     public void detectEdgesTest() throws InterruptedException {

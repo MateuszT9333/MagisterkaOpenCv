@@ -4,10 +4,9 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
+import pl.mateusz.agerecognition.utils.Coordinates;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WrinkleFeature {
     final static String resourcesPath = "src/resources/";
@@ -24,6 +23,7 @@ public class WrinkleFeature {
 
     //Only one instance of mapOfDetectecObjects. This map has List of rectangles of detectec object e.g. nose.
     public final static Map<String, List<Rect>> mapOfDetectedObjects = new HashMap<>();
+    public static int distanseBetweenEyes = 0;
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -67,14 +67,51 @@ public class WrinkleFeature {
 
     }
     public static Mat detectEyes(Mat croppedImage){
+        //Reference copy
         Mat tempCroppedImage = croppedImage;
-        int centerOfLeftEye = 0;
-        int centerOfRightEye = 0;
-        //TODO wyznaczyc srodek lewego i prawego oka.
+
         tempCroppedImage = getMatWithDetectedObjects(eyesDetectorPath, tempCroppedImage, mapOfDetectedObjects
                 , "Eyes", false);
 
+        List<Rect> listOfEyesRectangles = mapOfDetectedObjects.get("Eyes");
+        if(listOfEyesRectangles.size() != 2){
+            System.err.println("Number of detected eyes is not equal 2... Are you alien?...");
+            return tempCroppedImage;
+        }
+        Rect firstEyeRectangle = listOfEyesRectangles.get(0);
+        Rect secondEyeRectangle = listOfEyesRectangles.get(1);
+
+        List<Rect> centerOfEyes  = evaluateCenterOfEye(firstEyeRectangle, secondEyeRectangle);
+        mapOfDetectedObjects.put("Center of Eyes", centerOfEyes);
      return tempCroppedImage;
+    }
+
+
+    private static List<Rect> evaluateCenterOfEye(Rect firstEye, Rect secondEye) {
+        //Reference copy
+        Rect tempFirstEye = firstEye;
+        Rect tempSecondEye = secondEye;
+
+        Coordinates eyeOne = new Coordinates();
+        Coordinates eyeTwo = new Coordinates();
+
+        List<Rect> centerOfEyes = new ArrayList<>();
+
+        eyeOne.x = tempFirstEye.x + tempFirstEye.width/2;
+        eyeOne.y = tempFirstEye.y + tempFirstEye.height/2;
+
+        eyeTwo.x = tempSecondEye.x + tempSecondEye.width/2;
+        eyeTwo.y = tempSecondEye.y + tempSecondEye.height/2;
+
+        distanseBetweenEyes = Coordinates.getDistance(eyeOne, eyeTwo);
+
+        tempFirstEye = new Rect(eyeOne.x, eyeOne.y, 0, 0);
+        tempSecondEye = new Rect(eyeTwo.x, eyeTwo.y, 0, 0);
+
+        centerOfEyes.add(tempFirstEye);
+        centerOfEyes.add(tempSecondEye);
+
+        return centerOfEyes;
     }
 
     /**
