@@ -6,6 +6,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import pl.mateusz.agerecognition.Imshow;
 import pl.mateusz.agerecognition.WrinkleFeature;
+import pl.mateusz.agerecognition.utils.Coordinates;
 
 public class WrinkleFeatureTest {
 
@@ -30,10 +31,19 @@ public class WrinkleFeatureTest {
         Thread.sleep(20000);
     }
     @Test
-    public void detectEyesMouthNoseTest() throws InterruptedException {
-        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(monalisa));
-        Mat eyesMouthNose = WrinkleFeature.detectEyesMouthNose(croppedFace);
-        Imshow.show(eyesMouthNose, "Detected features");
+    public void detectEyesNoseTest() throws InterruptedException {
+        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
+        Mat eyesMouthNose = WrinkleFeature.detectPairOfEyesAndNose(croppedFace);
+        System.out.println(WrinkleFeature.mapOfDetectedObjects.toString());
+       // Imshow.show(eyesMouthNose, "Detected features");
+      //  Thread.sleep(20000);
+    }
+    @Test
+    public void detectEyesTest() throws InterruptedException {
+        croppedFace = WrinkleFeature.faceDetector(Imgcodecs.imread(ryjek));
+        Mat eyes = WrinkleFeature.detectEyes(croppedFace);
+        System.out.println(WrinkleFeature.mapOfDetectedObjects.toString());
+        Imshow.show(eyes);
         Thread.sleep(20000);
     }
     @Test
@@ -42,6 +52,11 @@ public class WrinkleFeatureTest {
         Mat edges = WrinkleFeature.detectEdges(croppedFace);
         Imshow.show(edges);
         Thread.sleep(20000);
+    }
+    @Test
+    public void distanseFromCoordinatesTest() throws InterruptedException {
+         int result = Coordinates.getDistance(new Coordinates(10,252), new Coordinates(121,2131));
+         System.out.println(result);
     }
 
     void showImage(String imagePath, String frameTitle){

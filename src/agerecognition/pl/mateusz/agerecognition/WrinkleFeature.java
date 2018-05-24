@@ -1,10 +1,13 @@
 package pl.mateusz.agerecognition;
 
 import org.opencv.core.*;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WrinkleFeature {
     final static String resourcesPath = "src/resources/";
@@ -14,7 +17,13 @@ public class WrinkleFeature {
     final static String lbpcascadeFrontalFaceDetectorPath = xmlPath + "lbpcascade_frontalface.xml";
     final static String mouthDetectorPath = xmlPath + "haarcascade_mouth.xml";
     final static String noseDetectorPath = xmlPath + "haarcascade_nose.xml";
-    final static String eyeDetectorPath = xmlPath + "haarcascade_eye_big.xml";
+    final static String eyePairDetectorPath = xmlPath + "haarcascade_eye_pair_big.xml";
+    final static String eyesDetectorPath = xmlPath + "haarcascade_eyes.xml";
+
+
+
+    //Only one instance of mapOfDetectecObjects. This map has List of rectangles of detectec object e.g. nose.
+    public final static Map<String, List<Rect>> mapOfDetectedObjects = new HashMap<>();
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -30,39 +39,54 @@ public class WrinkleFeature {
     public static Mat faceDetector(Mat image) {
         //Make a Mat with cropped face area...
         Mat grayImage = makeGrayImage(image);
-        Mat faceImage = getMatWithDetectedObjects(lbpcascadeFrontalFaceDetectorPath, grayImage, null,
-                true);
+        Mat faceImage = getMatWithDetectedObjects(lbpcascadeFrontalFaceDetectorPath, grayImage, null, "Detected %s faces"
+                , true);
         //Drawing a black rectangle to crop a face
         return faceImage;
     }
 
-    public static Mat detectEyesMouthNose(Mat croppedImage) {
+    /**
+     * Method for detecting eyes and mouth.
+     * @param croppedImage
+     * @return Mat with detected objects as a black rectangles.
+     */
+    public static Mat detectPairOfEyesAndNose(Mat croppedImage) {
         Mat tempCroppedImage = croppedImage;
+
         //Detect eyes
-        tempCroppedImage = getMatWithDetectedObjects(eyeDetectorPath, tempCroppedImage, null,
-               false);
+        tempCroppedImage = getMatWithDetectedObjects(eyePairDetectorPath, tempCroppedImage, mapOfDetectedObjects
+                , "EyePair", false);
         //Detect nose
-        tempCroppedImage = getMatWithDetectedObjects(noseDetectorPath, tempCroppedImage, null,
-              false);
+        tempCroppedImage = getMatWithDetectedObjects(noseDetectorPath, tempCroppedImage, mapOfDetectedObjects
+                , "Nose",  false);
+        tempCroppedImage = detectEyes(tempCroppedImage);
         //Detect mouth
 //        tempCroppedImage = getMatWithDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
 //                false);
         return tempCroppedImage;
 
     }
+    public static Mat detectEyes(Mat croppedImage){
+        Mat tempCroppedImage = croppedImage;
+        int centerOfLeftEye = 0;
+        int centerOfRightEye = 0;
+        //TODO wyznaczyc srodek lewego i prawego oka.
+        tempCroppedImage = getMatWithDetectedObjects(eyesDetectorPath, tempCroppedImage, mapOfDetectedObjects
+                , "Eyes", false);
+
+     return tempCroppedImage;
+    }
 
     /**
+     * Method generating Mat which include detected objects.
      * @param cascadeClassifierPath
      * @param image
-     * @param message               if message is null it will display "Detected x objects".
-     *                              If you want to display another message type "Detected %s [typeOfObjects]"
-     *                              In [typeOfObjects] you have to write a type of objects you currently detecting.
-     *                              Example: "Detected %s faces".
-     *                              %s is required because it represents a number of detected objects e.g. faces in image.
-     * @return
+     * @param mapOfDetectedObjects object which maps name of object to list of Rect.
+     * @param kindOfDetectedObject
+     * @param cropImageToDetectedObject
+     * @return Mat with cropped detected area or with drew detected area.
      */
-    private static Mat getMatWithDetectedObjects(String cascadeClassifierPath, Mat image, String message,
-                                                 boolean cropImageToDetectedObject) {
+    private static Mat getMatWithDetectedObjects(String cascadeClassifierPath, Mat image, Map<String, List<Rect>> mapOfDetectedObjects, String kindOfDetectedObject, boolean cropImageToDetectedObject) {
         Mat tempImage = image;
         CascadeClassifier cascadeClassifier = new CascadeClassifier(cascadeClassifierPath);
         //Creating Mat object from image passed as parameter
@@ -73,17 +97,9 @@ public class WrinkleFeature {
                 Objdetect.CASCADE_FIND_BIGGEST_OBJECT
                 , new org.opencv.core.Size(30, 30),
                 new org.opencv.core.Size());
-
-        if (message == null) {
-            System.out.println(String.format("Detected %s objects", objectDetections.toArray().length));
-
-        } else if (!message.contains("%s")) {
-
-            System.out.println("Wrong format of message parameter... I'll write default string");
-            System.out.println(String.format("Detected %s objects", objectDetections.toArray().length));
-
-        } else {
-            System.out.println(String.format(message, objectDetections.toArray().length));
+        //Mapping kindOfObject e.g. nose to list of Rect which defining coordinates on image of detected objects.
+        if(mapOfDetectedObjects != null) {
+            mapOfDetectedObjects.put(kindOfDetectedObject, objectDetections.toList());
         }
 
         //Croping an image to detected object
