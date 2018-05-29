@@ -1,7 +1,4 @@
-/**
- * @author Mateusz Trzeciak
- * Some tests...
- */
+
 package test;
 
 import org.junit.Test;
@@ -14,11 +11,15 @@ import pl.mateusz.agerecognition.utils.Imshow;
 import pl.mateusz.agerecognition.utils.NumberOfDetectedObjectsException;
 import pl.mateusz.agerecognition.utils.Paths;
 
+/**
+ * @author Mateusz Trzeciak
+ * Some tests...
+ */
 public class WrinkleFeatureTest {
 
-    public final static String lenaPath = Paths.testImagesPath + "lena.png";
-    public final static String ryjek = Paths.testImagesPath + "ryjek.jpg";
-    public final static String monalisa = Paths.testImagesPath + "monalisa.jpg";
+    private final static String lenaPath = Paths.testImagesPath + "lena.png";
+    private final static String ryjek = Paths.testImagesPath + "ryjek.jpg";
+    private final static String monalisa = Paths.testImagesPath + "monalisa.jpg";
 
     Mat processedImage = Imgcodecs.imread(ryjek);
 
@@ -77,7 +78,7 @@ public class WrinkleFeatureTest {
             e.printStackTrace();
         }
         wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
-        System.out.println("Wrinkle features " + wrinkleFeature.wrinkleFeatures);
+        System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
         Thread.sleep(20000);
     }
 
@@ -94,7 +95,10 @@ public class WrinkleFeatureTest {
         Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes");
         Imshow.show(wrinkleFeature.getDetectedEdges(), "Detected edges");
         wrinkleFeature.showWrinkleAreas(new Scalar(255, 0, 0));
-        System.out.println("Wrinkle features " + wrinkleFeature.wrinkleFeatures);
+        System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
+        System.out.println("Detected objects " + wrinkleFeature.getDetectedObjects());
+        System.out.println("Calculated wrinkle areas " + wrinkleFeature.getWrinkleAreas());
         Thread.sleep(1000000);
     }
+
 }
