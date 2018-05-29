@@ -15,7 +15,7 @@ import static pl.mateusz.agerecognition.utils.DetectedObjectsEnum.*;
 
 /**
  * @author Mateusz Trzeciak
- * Class for detecting wrinkle features in face image...
+ * Class for detecting wrinkle features in face image.
  */
 public class WrinkleFeature {
 
