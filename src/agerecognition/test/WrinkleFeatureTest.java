@@ -72,12 +72,29 @@ public class WrinkleFeatureTest {
     public void calculateWrinkleFeaturesTest() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
         try {
-            wrinkleFeature = new WrinkleFeature(ryjek);
+            wrinkleFeature = new WrinkleFeature(monalisa);
         } catch (NumberOfDetectedObjectsException e) {
             e.printStackTrace();
         }
         wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
         System.out.println("Wrinkle features " + wrinkleFeature.wrinkleFeatures);
         Thread.sleep(20000);
+    }
+
+    @Test
+    public void showGeneratedImages() throws InterruptedException {
+        WrinkleFeature wrinkleFeature = null;
+        try {
+            wrinkleFeature = new WrinkleFeature(ryjek);
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
+        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal");
+        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face");
+        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes");
+        Imshow.show(wrinkleFeature.getDetectedEdges(), "Detected edges");
+        wrinkleFeature.showWrinkleAreas(new Scalar(255, 0, 0));
+        System.out.println("Wrinkle features " + wrinkleFeature.wrinkleFeatures);
+        Thread.sleep(1000000);
     }
 }

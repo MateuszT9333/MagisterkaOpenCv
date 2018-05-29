@@ -49,13 +49,6 @@ public class WrinkleFeature {
 //        this.wrinkleFeatures = calculateWrinkleFeatures();
     }
 
-    public WrinkleFeature() {
-        this.path = null;
-        this.processedMat = null;
-        this.wrinkleFeatures = 0f;
-        this.croppedToFace = null;
-        this.detectedNoseAndEyes = null;
-    }
 
 
     static {
@@ -63,7 +56,7 @@ public class WrinkleFeature {
         System.out.println("OpenCv Core loaded");
     }
 
-    public static Mat drawARectanglesInMat(Mat source, Rect... rect) {
+    private static Mat drawARectanglesInMat(Mat source, Rect... rect) {
         Mat temp = source.clone();
         for (Rect rectItem : rect) {
             Imgproc.rectangle(temp, new Point(rectItem.x, rectItem.y), new Point(rectItem.x + rectItem.width
@@ -72,7 +65,7 @@ public class WrinkleFeature {
         return temp;
     }
 
-    public static Mat drawARectanglesInMat(Mat source, Scalar scalar, Rect... rect) {
+    private static Mat drawARectanglesInMat(Mat source, Scalar scalar, Rect... rect) {
         Mat temp = source.clone();
         for (Rect rectItem : rect) {
             Imgproc.rectangle(temp, new Point(rectItem.x, rectItem.y), new Point(rectItem.x + rectItem.width
@@ -93,7 +86,7 @@ public class WrinkleFeature {
      * @param source
      * @return image with detected edges
      */
-    public static Mat detectEdges(Mat source) {
+    private static Mat detectEdges(Mat source) {
         Mat destination = source.clone();
         Imgproc.Canny(source, destination, 10, 100);
         return destination;
@@ -192,38 +185,9 @@ public class WrinkleFeature {
         }
     }
 
-    /**
-     * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
-     */
-    public void detectPairOfEyesAndNose() {
-        Mat temp = this.croppedToFace.clone();
-        //Detect eyes pair
-        detectEyesPair(temp);
-        //Detect nose
-        detectNose(temp);
-        //Detect eyes, calculate center of eyes and distance between them
-        detectEyes(temp);
-
-        //Detect mouth
-//        tempCroppedImage = addDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
-//                false);
-        Rect centerOfEyeOne = this.detectedObjects
-                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
-
-        Rect centerOfEyeTwo = this.detectedObjects
-                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
-
-        centerOfEyeOne.width += 10;
-        centerOfEyeOne.height += 10;
-
-        centerOfEyeTwo.width += 10;
-        centerOfEyeTwo.height += 10;
-
-        this.detectedNoseAndEyes = drawARectanglesInMat(temp
-                , detectedObjects.get(EYE_PAIR).get(0)
-                , detectedObjects.get(NOSE).get(0)
-                , centerOfEyeOne
-                , centerOfEyeTwo);
+    private static void makeGrayImage(Mat oryginal) {
+        Mat originalCopy = oryginal.clone();
+        Imgproc.cvtColor(originalCopy, oryginal, Imgproc.COLOR_BGR2GRAY);
     }
 
     private void detectEyes(Mat croppedImage) {
@@ -280,9 +244,38 @@ public class WrinkleFeature {
         }
     }
 
-    public static void makeGrayImage(Mat oryginal) {
-        Mat originalCopy = oryginal.clone();
-        Imgproc.cvtColor(originalCopy, oryginal, Imgproc.COLOR_BGR2GRAY);
+    /**
+     * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
+     */
+    private void detectPairOfEyesAndNose() {
+        Mat temp = this.croppedToFace.clone();
+        //Detect eyes pair
+        detectEyesPair(temp);
+        //Detect nose
+        detectNose(temp);
+        //Detect eyes, calculate center of eyes and distance between them
+        detectEyes(temp);
+
+        //Detect mouth
+//        tempCroppedImage = addDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
+//                false);
+        Rect centerOfEyeOne = this.detectedObjects
+                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
+
+        Rect centerOfEyeTwo = this.detectedObjects
+                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
+
+        centerOfEyeOne.width += 10;
+        centerOfEyeOne.height += 10;
+
+        centerOfEyeTwo.width += 10;
+        centerOfEyeTwo.height += 10;
+
+        this.detectedNoseAndEyes = drawARectanglesInMat(temp
+                , detectedObjects.get(EYE_PAIR).get(0)
+                , detectedObjects.get(NOSE).get(0)
+                , centerOfEyeOne
+                , centerOfEyeTwo);
     }
 
     /**
@@ -368,9 +361,9 @@ public class WrinkleFeature {
     }
 
     public void showWrinkleAreas(Scalar scalar) {
-        Mat temp = this.croppedToFace.clone();
+        Mat temp = this.detectedEdges.clone();
         drawARectangleInMat(temp, scalar, wrinkleAreas);
-        Imshow.show(temp);
+        Imshow.show(temp, "Wrinkle areas");
     }
     private Rect getRectOfForeheadArea(Rect centerOfFirstEye, Rect centerOfSecondEye) {
 
