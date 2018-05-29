@@ -7,11 +7,11 @@ package test;
 import org.junit.Test;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import pl.mateusz.agerecognition.WrinkleFeature;
-import pl.mateusz.agerecognition.utils.DetectedObjectsEnum;
 import pl.mateusz.agerecognition.utils.Imshow;
+import pl.mateusz.agerecognition.utils.NumberOfDetectedObjectsException;
 import pl.mateusz.agerecognition.utils.Paths;
 
 public class WrinkleFeatureTest {
@@ -28,57 +28,38 @@ public class WrinkleFeatureTest {
 
     @Test
     public void faceDetectorTest() throws InterruptedException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(ryjek);
-        Mat croppedToFace = wrinkleFeature.faceDetector(processedImage, true);
-        Imshow.show(processedImage, "Oryginal");
-        Imshow.show(croppedToFace, "Cropped face");
+        WrinkleFeature wrinkleFeature = null;
+        try {
+            wrinkleFeature = new WrinkleFeature(ryjek);
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
+        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal");
+        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face");
         Thread.sleep(20000);
     }
 
     @Test
     public void detectPairOfEyesNoseTest() throws InterruptedException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(ryjek);
-        Mat croppedToFace = wrinkleFeature.faceDetector(processedImage, true);
-
-        wrinkleFeature.detectPairOfEyesAndNose(croppedToFace);
-
-        System.out.println(wrinkleFeature.mapOfDetectedObjects.toString());
-
-        Rect centerOfEyeOne = wrinkleFeature.mapOfDetectedObjects
-                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
-
-        Rect centerOfEyeTwo = wrinkleFeature.mapOfDetectedObjects
-                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
-
-        centerOfEyeOne.width += 10;
-        centerOfEyeOne.height += 10;
-
-        centerOfEyeTwo.width += 10;
-        centerOfEyeTwo.height += 10;
-
-        WrinkleFeature.drawARectanglesInMat(croppedToFace, centerOfEyeOne, centerOfEyeTwo);
-
-        Imshow.show(croppedToFace, "Detected features");
-        Thread.sleep(20000);
-    }
-
-    @Test
-    public void detectEyesTest() throws InterruptedException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(ryjek);
-        Mat croppedToFace = wrinkleFeature.faceDetector(processedImage, true);
-        wrinkleFeature.detectEyes(croppedToFace);
-
-        System.out.println(wrinkleFeature.mapOfDetectedObjects.toString());
-        Imshow.show(croppedToFace);
+        WrinkleFeature wrinkleFeature = null;
+        try {
+            wrinkleFeature = new WrinkleFeature(ryjek);
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
+        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes");
         Thread.sleep(20000);
     }
 
     @Test
     public void detectEdgesTest() throws InterruptedException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(ryjek);
-        Mat croppedToFace = wrinkleFeature.faceDetector(processedImage, true);
-        WrinkleFeature.detectEdges(croppedToFace);
-        Imshow.show(croppedToFace);
+        WrinkleFeature wrinkleFeature = null;
+        try {
+            wrinkleFeature = new WrinkleFeature(ryjek);
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
+        Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges");
         Thread.sleep(20000);
     }
 
@@ -89,8 +70,13 @@ public class WrinkleFeatureTest {
 
     @Test
     public void calculateWrinkleFeaturesTest() throws InterruptedException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(ryjek);
-        wrinkleFeature.showDetectedAndGeneratedFeatures();
+        WrinkleFeature wrinkleFeature = null;
+        try {
+            wrinkleFeature = new WrinkleFeature(ryjek);
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
+        wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
         System.out.println("Wrinkle features " + wrinkleFeature.wrinkleFeatures);
         Thread.sleep(20000);
     }

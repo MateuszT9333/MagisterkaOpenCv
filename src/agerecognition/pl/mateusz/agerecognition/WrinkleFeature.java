@@ -16,26 +16,113 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static pl.mateusz.agerecognition.utils.DetectedObjectsEnum.*;
+
 public class WrinkleFeature {
 
-    public final Map<DetectedObjectsEnum, List<Rect>> mapOfDetectedObjects = new HashMap<>();
-    public final List<Rect> wrinkleAreas = new ArrayList<>();
+    private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
+    private final List<Rect> wrinkleAreas = new ArrayList<>();
     private final String path;
     private final Mat processedMat;
-    private final Mat croppedToFace;
-    public final float wrinkleFeatures;
+    public float wrinkleFeatures;
+    private Mat grayProcessedMat;
+    private Mat croppedToFace;
+    private Mat detectedNoseAndEyes;
+    private Mat detectedEdges;
 
-    public WrinkleFeature(String path) {
+    /**
+     * Constructor detecting face in image and calculating wrinkle featurer
+     *
+     * @param path
+     * @throws NumberOfDetectedObjectsException if detected faces < 1
+     */
+    public WrinkleFeature(String path) throws NumberOfDetectedObjectsException {
         this.path = path;
         this.processedMat = Imgcodecs.imread(path);
-        this.croppedToFace = faceDetector(processedMat, true);
-        detectPairOfEyesAndNose(this.croppedToFace);
-        this.wrinkleFeatures = calculateWrinkleFeatures();
+        // this.croppedToFace = faceDetector(true);
+        faceDetector();
+        cropToFace();
+        detectPairOfEyesAndNose();
+        calculateWrinkleFeatures();
+
+//        this.detectedNoseAndEyes = detectPairOfEyesAndNose(this.croppedToFace);
+//        this.wrinkleFeatures = calculateWrinkleFeatures();
     }
+
+    public WrinkleFeature() {
+        this.path = null;
+        this.processedMat = null;
+        this.wrinkleFeatures = 0f;
+        this.croppedToFace = null;
+        this.detectedNoseAndEyes = null;
+    }
+
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         System.out.println("OpenCv Core loaded");
+    }
+
+    public static Mat drawARectanglesInMat(Mat source, Rect... rect) {
+        Mat temp = source.clone();
+        for (Rect rectItem : rect) {
+            Imgproc.rectangle(temp, new Point(rectItem.x, rectItem.y), new Point(rectItem.x + rectItem.width
+                    , rectItem.y + rectItem.height), new Scalar(0, 0, 0));
+        }
+        return temp;
+    }
+
+    public static Mat drawARectanglesInMat(Mat source, Scalar scalar, Rect... rect) {
+        Mat temp = source.clone();
+        for (Rect rectItem : rect) {
+            Imgproc.rectangle(temp, new Point(rectItem.x, rectItem.y), new Point(rectItem.x + rectItem.width
+                    , rectItem.y + rectItem.height), scalar);
+        }
+        return temp;
+    }
+
+    private static Mat generateCroppedMat(Mat processedImage, MatOfRect objectDetections) {
+        Rect rectangleToCrop = null;
+        for (Rect rect : objectDetections.toArray()) {
+            rectangleToCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
+        }
+        return new Mat(processedImage, rectangleToCrop);
+    }
+
+    /**
+     * @param source
+     * @return image with detected edges
+     */
+    public static Mat detectEdges(Mat source) {
+        Mat destination = source.clone();
+        Imgproc.Canny(source, destination, 10, 100);
+        return destination;
+    }
+
+    /**
+     * Initialiaze this.croppedToFace and this.croppedToFaceWorkCopy fields
+     *
+     * @throws NumberOfDetectedObjectsException
+     */
+    private void cropToFace() throws NumberOfDetectedObjectsException {
+        int detectedFaces = detectedObjects.get(FACES).size();
+
+        if (detectedFaces < 1) {
+            throw new NumberOfDetectedObjectsException(this.path);
+        } else if (detectedFaces > 1) {
+            //TODO
+        } else {
+            Rect detectedFace = detectedObjects.get(FACES).get(0);
+            this.croppedToFace = generateCroppedMat(this.grayProcessedMat, detectedFace);
+        }
+    }
+
+    public Mat getCroppedToFace() {
+        return croppedToFace;
+    }
+
+    public Mat getProcessedMat() {
+        return processedMat;
     }
 
     /**
@@ -66,19 +153,16 @@ public class WrinkleFeature {
         return eyeballsCenter;
     }
 
-    public static void drawARectanglesInMat(Mat tempImage, Rect... rect) {
-        for (Rect rectItem : rect) {
-            Imgproc.rectangle(tempImage, new Point(rectItem.x, rectItem.y), new Point(rectItem.x + rectItem.width
-                    , rectItem.y + rectItem.height), new Scalar(0, 0, 0));
-        }
+    public Mat getDetectedNoseAndEyes() {
+        return detectedNoseAndEyes;
     }
 
-    private static Mat generateCroppedMat(Mat processedImage, MatOfRect objectDetections) {
-        Rect rectangleOfFaceToCrop = null;
-        for (Rect rect : objectDetections.toArray()) {
-            rectangleOfFaceToCrop = new Rect(rect.x, rect.y, rect.width, rect.height);
-        }
-        return new Mat(processedImage, rectangleOfFaceToCrop);
+    public Mat getDetectedEdges() {
+        return detectedEdges;
+    }
+
+    public Map<DetectedObjectsEnum, List<Rect>> getDetectedObjects() {
+        return detectedObjects;
     }
 
     private static Mat generateCroppedMat(Mat processedImage, Rect rect) {
@@ -87,132 +171,96 @@ public class WrinkleFeature {
         return new Mat(processedImage, rectangleOfFaceToCrop);
     }
 
+    public List<Rect> getWrinkleAreas() {
+        return wrinkleAreas;
+    }
+
     /**
-     * Returning detected face area (cropped or in rectangle, depends on cropImage boolean parameter)
+     * Adding faces rectangles to detectedObjectMap, initialize this.grayProcessedMat field
      *
-     * @param imageToProcess
-     * @return detected face area (cropped or in rectangle, depends on cropImage boolean parameter)
      */
-    public Mat faceDetector(Mat imageToProcess, boolean cropImage) {
-        makeGrayImage(imageToProcess);
+    private void faceDetector() {
+        this.grayProcessedMat = this.processedMat.clone();
+        makeGrayImage(grayProcessedMat);
         //Drawing a black rectangle to crop a face
         try {
-            return generateMatWithDetectedObjects(Paths.lbpcascadeFrontalFaceDetectorPath, imageToProcess
-                    , null, null
-                    , cropImage);
+            addDetectedObjects(Paths.lbpcascadeFrontalFaceDetectorPath
+                    , grayProcessedMat
+                    , FACES);
         } catch (NumberOfDetectedObjectsException e) {
             e.printStackTrace();
-            return null;
         }
     }
 
     /**
-     *
-     *
-     * @param croppedImage
-     * @return Mat with detected objects as a black rectangles.
+     * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
      */
-    public void detectPairOfEyesAndNose(Mat croppedImage) {
-
+    public void detectPairOfEyesAndNose() {
+        Mat temp = this.croppedToFace.clone();
         //Detect eyes pair
-        detectEyesPair(croppedImage);
+        detectEyesPair(temp);
         //Detect nose
-        detectNose(croppedImage);
+        detectNose(temp);
         //Detect eyes, calculate center of eyes and distance between them
-        detectEyes(croppedImage);
+        detectEyes(temp);
 
         //Detect mouth
-//        tempCroppedImage = generateMatWithDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
+//        tempCroppedImage = addDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
 //                false);
+        Rect centerOfEyeOne = this.detectedObjects
+                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
+
+        Rect centerOfEyeTwo = this.detectedObjects
+                .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
+
+        centerOfEyeOne.width += 10;
+        centerOfEyeOne.height += 10;
+
+        centerOfEyeTwo.width += 10;
+        centerOfEyeTwo.height += 10;
+
+        this.detectedNoseAndEyes = drawARectanglesInMat(temp
+                , detectedObjects.get(EYE_PAIR).get(0)
+                , detectedObjects.get(NOSE).get(0)
+                , centerOfEyeOne
+                , centerOfEyeTwo);
     }
 
-    public void detectEyes(Mat croppedImage) {
-
+    private void detectEyes(Mat croppedImage) {
         try {
-            generateMatWithDetectedObjects(Paths.eyesDetectorPath, croppedImage, mapOfDetectedObjects
-                    , DetectedObjectsEnum.EYES, false);
+            addDetectedObjects(Paths.eyesDetectorPath, croppedImage
+                    , DetectedObjectsEnum.EYES);
         } catch (NumberOfDetectedObjectsException e) {
             e.printStackTrace();
         }
 
-        List<Rect> listOfEyesRectangles = mapOfDetectedObjects.get(DetectedObjectsEnum.EYES);
+        List<Rect> listOfEyesRectangles = detectedObjects.get(DetectedObjectsEnum.EYES);
 
         Rect firstEyeRectangle = listOfEyesRectangles.get(0);
         Rect secondEyeRectangle = listOfEyesRectangles.get(1);
 
         List<Rect> eyeballsCenter = calculateCenterOfEye(firstEyeRectangle, secondEyeRectangle);
-        mapOfDetectedObjects.put(DetectedObjectsEnum.EYEBALLS_CENTER, eyeballsCenter);
+        detectedObjects.put(DetectedObjectsEnum.EYEBALLS_CENTER, eyeballsCenter);
+
     }
 
     private void detectEyesPair(Mat croppedImage) {
         try {
-            generateMatWithDetectedObjects(Paths.eyePairDetectorPath, croppedImage, mapOfDetectedObjects
-                    , DetectedObjectsEnum.EYE_PAIR, false);
+            addDetectedObjects(Paths.eyePairDetectorPath, croppedImage
+                    , DetectedObjectsEnum.EYE_PAIR);
         } catch (NumberOfDetectedObjectsException e) {
             e.printStackTrace();
         }
     }
 
     private void detectNose(Mat croppedImage) {
-
+        Mat temp = croppedImage;
         try {
-            generateMatWithDetectedObjects(Paths.noseDetectorPath, croppedImage, mapOfDetectedObjects
-                    , DetectedObjectsEnum.NOSE, false);
+            addDetectedObjects(Paths.noseDetectorPath, temp
+                    , DetectedObjectsEnum.NOSE);
         } catch (NumberOfDetectedObjectsException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Method changing to Mat which include detected objects.
-     * @param cascadeClassifierPath
-     * @param image
-     * @param mapOfDetectedObjects
-     * @param kindOfDetectedObject
-     * @param
-     */
-
-    private Mat generateMatWithDetectedObjects(String cascadeClassifierPath, Mat image
-            , Map<DetectedObjectsEnum, List<Rect>> mapOfDetectedObjects, DetectedObjectsEnum kindOfDetectedObject
-            , boolean cropImage) throws NumberOfDetectedObjectsException {
-
-        CascadeClassifier cascadeClassifier = new CascadeClassifier(cascadeClassifierPath);
-        //Creating Mat object from image passed as parameter
-        MatOfRect objectDetections = new MatOfRect();
-
-        // cascadeClassifier.detectMultiScale(tempImage, objectDetections);
-        //Detecting objects
-        cascadeClassifier.detectMultiScale(image, objectDetections, 1.1
-                , 10
-                , Objdetect.CASCADE_FIND_BIGGEST_OBJECT
-                , new org.opencv.core.Size(30, 30)
-                , new org.opencv.core.Size());
-
-        int sizeOfObjectDetectionList = objectDetections.toList().size();
-
-        //If detected pair of eyes or nose is not equal one then throw NumberOfDetectedObjectsException
-        if (((kindOfDetectedObject == DetectedObjectsEnum.EYE_PAIR)
-                || (kindOfDetectedObject == DetectedObjectsEnum.NOSE))
-                && sizeOfObjectDetectionList != 1) {
-            throw new NumberOfDetectedObjectsException(this.path);
-        }
-        // If detected number of eyes and center of eyes is not equal to throw NumberOfDetectedObjectsException
-        if ((kindOfDetectedObject == DetectedObjectsEnum.EYES)
-                && (sizeOfObjectDetectionList != 2)) {
-            throw new NumberOfDetectedObjectsException(this.path);
-        }
-        //Mapping kindOfObject e.g. nose to list of Rect which defining coordinates on image of detected objects.
-        if (mapOfDetectedObjects != null) {
-            mapOfDetectedObjects.put(kindOfDetectedObject, objectDetections.toList());
-        }
-        //Croping an image to detected object
-        if (cropImage == true) {
-            return generateCroppedMat(image, objectDetections);
-        } else {
-            //Drawing a rectangle over detected object
-            return drawARectangleInMat(image, objectDetections);
-        }
-
     }
 
     private static Mat drawARectangleInMat(Mat tempImage, MatOfRect objectDetections) {
@@ -238,21 +286,56 @@ public class WrinkleFeature {
     }
 
     /**
-     * @param oryginal - must be gray image
-     * @return image with detected edges
+     * Method changing to Mat which include detected objects.
+     * @param cascadeClassifierPath
+     * @param image
+     * @param kindOfDetectedObject
+     * @param
      */
-    public static void detectEdges(Mat oryginal) {
-        Mat originalCopy = oryginal.clone();
-        Imgproc.Canny(originalCopy, oryginal, 10, 100);
+
+    private void addDetectedObjects(String cascadeClassifierPath
+            , Mat image
+            , DetectedObjectsEnum kindOfDetectedObject) throws NumberOfDetectedObjectsException {
+
+        //Detecting objects
+        CascadeClassifier cascadeClassifier = new CascadeClassifier(cascadeClassifierPath);
+        MatOfRect objectDetections = new MatOfRect();
+
+        // cascadeClassifier.detectMultiScale(tempImage, objectDetections);
+
+        cascadeClassifier.detectMultiScale(image, objectDetections, 1.1
+                , 10
+                , Objdetect.CASCADE_FIND_BIGGEST_OBJECT
+                , new org.opencv.core.Size(30, 30)
+                , new org.opencv.core.Size());
+
+        int sizeOfObjectDetectionList = objectDetections.toList().size();
+
+        //If detected pair of eyes or nose is not equal one then throw NumberOfDetectedObjectsException
+        if (((kindOfDetectedObject == DetectedObjectsEnum.EYE_PAIR)
+                || (kindOfDetectedObject == DetectedObjectsEnum.NOSE))
+                && sizeOfObjectDetectionList != 1) {
+            throw new NumberOfDetectedObjectsException(this.path);
+        }
+        // If detected number of eyes and center of eyes is not equal to throw NumberOfDetectedObjectsException
+        if ((kindOfDetectedObject == DetectedObjectsEnum.EYES)
+                && (sizeOfObjectDetectionList != 2)) {
+            throw new NumberOfDetectedObjectsException(this.path);
+        }
+
+        //Mapping kindOfObject e.g. nose to list of Rect which defining coordinates on image of detected objects.
+        if (detectedObjects != null) {
+            detectedObjects.put(kindOfDetectedObject, objectDetections.toList());
+        }
     }
 
-    private float calculateWrinkleFeatures() {
+    private void calculateWrinkleFeatures() {
 
-        Rect eyePair = mapOfDetectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
-        Rect nose = mapOfDetectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
+        Rect eyePair = detectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
+        Rect nose = detectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
 
-        Rect centerOfFirstEye = mapOfDetectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
-        Rect centerOfSecondEye = mapOfDetectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
+        Rect centerOfFirstEye = detectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
+        Rect centerOfSecondEye = detectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
 
         Rect foreheadArea = getRectOfForeheadArea(centerOfFirstEye, centerOfSecondEye);
         Rect leftCheekArea = getRectOfLeftCheekArea(eyePair, nose);
@@ -260,7 +343,7 @@ public class WrinkleFeature {
         Rect leftEyeCornerArea = getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
 
-        detectEdges(this.croppedToFace);
+        this.detectedEdges = detectEdges(this.croppedToFace.clone());
 
         wrinkleAreas.add(foreheadArea);
         wrinkleAreas.add(leftCheekArea);
@@ -269,25 +352,25 @@ public class WrinkleFeature {
         wrinkleAreas.add(rightEyeCornerArea);
 
         float sumOfWrinkleFeatures = 0;
+
         for (Rect wrinkleArea : wrinkleAreas) {
             sumOfWrinkleFeatures += calculateWhiteToAllPixelsRatio(wrinkleArea);
         }
-
-        return sumOfWrinkleFeatures;
+        this.wrinkleFeatures = sumOfWrinkleFeatures;
     }
 
     private float calculateWhiteToAllPixelsRatio(Rect wrinkleArea) {
         Mat croppedWrinkleArea = new Mat();
-        Core.extractChannel(generateCroppedMat(this.croppedToFace, wrinkleArea), croppedWrinkleArea, 0);
-
+        Mat croppedMat = generateCroppedMat(this.detectedEdges, wrinkleArea);
+        Core.extractChannel(croppedMat, croppedWrinkleArea, 0);
         int whitePixels = Core.countNonZero(croppedWrinkleArea);
-        Imshow.show(croppedWrinkleArea);
         return (float) whitePixels / (croppedWrinkleArea.rows() * croppedWrinkleArea.cols());
     }
 
-    public void showDetectedAndGeneratedFeatures() {
-        drawARectangleInMat(this.croppedToFace, new Scalar(255, 0, 0), wrinkleAreas);
-        Imshow.show(this.croppedToFace);
+    public void showWrinkleAreas(Scalar scalar) {
+        Mat temp = this.croppedToFace.clone();
+        drawARectangleInMat(temp, scalar, wrinkleAreas);
+        Imshow.show(temp);
     }
     private Rect getRectOfForeheadArea(Rect centerOfFirstEye, Rect centerOfSecondEye) {
 
