@@ -1,4 +1,4 @@
-package pl.mateusz.agerecognition;
+package pl.mateusz.agerecognition.wrinklefeature;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -39,14 +39,18 @@ public class WrinkleFeature {
      * Constructor detecting face in image and calculating wrinkle featurer
      *
      * @param path path to processed file
-     * @throws NumberOfDetectedObjectsException if detected faces < 1
      */
-    public WrinkleFeature(String path) throws NumberOfDetectedObjectsException {
+    public WrinkleFeature(String path) {
         this.path = path;
         this.processedMat = Imgcodecs.imread(path);
         // this.croppedToFace = faceDetector(true);
         faceDetector();
-        cropToFace();
+
+        try {
+            cropToFace();
+        } catch (NumberOfDetectedObjectsException e) {
+            e.printStackTrace();
+        }
         detectPairOfEyesAndNose();
         calculateWrinkleFeatures();
     }
@@ -129,7 +133,7 @@ public class WrinkleFeature {
         if (detectedFaces < 1) {
             throw new NumberOfDetectedObjectsException(this.path + " No face detected!");
         } else if (detectedFaces > 1) {
-            //TODO
+            //TODO Co jesli wykryto wiecej twarzy?
         } else {
             Rect detectedFace = detectedObjects.get(FACES).get(0);
             this.croppedToFace = ImageProcessing.generateCroppedMat(this.grayProcessedMat, detectedFace);

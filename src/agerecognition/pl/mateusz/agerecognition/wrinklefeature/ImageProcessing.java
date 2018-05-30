@@ -1,4 +1,4 @@
-package pl.mateusz.agerecognition;
+package pl.mateusz.agerecognition.wrinklefeature;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
