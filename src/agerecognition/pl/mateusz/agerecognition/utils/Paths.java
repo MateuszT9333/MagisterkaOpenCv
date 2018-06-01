@@ -15,4 +15,5 @@ public class Paths {
     public final static String eyePairDetectorPath = xmlPath + "haarcascade_eye_pair_big.xml";
     public final static String eyesDetectorPath = xmlPath + "haarcascade_eyes.xml";
     public final static String ageToRecognizePath = resourcesPath + "ageToRecognize/";
+    public final static String nullJpg = resourcesPath + "utils/null.jpg";
 }

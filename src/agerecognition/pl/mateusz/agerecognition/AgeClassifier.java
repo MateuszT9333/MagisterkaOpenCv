@@ -2,15 +2,17 @@ package pl.mateusz.agerecognition;
 
 import pl.mateusz.agerecognition.utils.AgeToWrinkleFeature;
 import pl.mateusz.agerecognition.utils.Paths;
+import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
 import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class AgeClassifier {
     private final static String trainingPath = Paths.trainingImagesPath;
-    private static List<AgeToWrinkleFeature> ageToWrinkleFeatureList;
+    private static List<AgeToWrinkleFeature> ageToWrinkleFeatureList = new ArrayList<>();
 
     public static void main(String[] args) {
         trainImages();
@@ -18,11 +20,36 @@ public class AgeClassifier {
 
     private static void trainImages() {
         File file = new File(trainingPath);
-        String[] images = file.list();
+        File[] images = file.listFiles();
 
-        for (String image : images) {
-            WrinkleFeature wrinkleFeature = new WrinkleFeature(image);
-            ageToWrinkleFeatureList.add(new AgeToWrinkleFeature(getAgeFromPath(image), wrinkleFeature.getWrinkleFeatures()));
+        for (File image : images) {
+            WrinkleFeature wrinkleFeature = null;
+
+            if (!file.exists()) {
+                System.err.println("No file with path " + file.getAbsolutePath());
+            }
+
+            try {
+                wrinkleFeature = new WrinkleFeature(image.getAbsolutePath(), false);
+            } catch (WrinkleFeaturesException e) {
+                continue;
+            } catch (NullPointerException e) {
+                System.err.println("Path " + image.getAbsolutePath());
+                e.printStackTrace();
+            } catch (Error e) {
+                System.err.println("Error: Path: " + image.getAbsolutePath());
+                e.printStackTrace();
+                continue;
+            } catch (Exception e) {
+                System.err.println("Error: Path: " + image.getAbsolutePath());
+                e.printStackTrace();
+                continue;
+            }
+
+            float wrinkleFeatureResult = wrinkleFeature.getWrinkleFeatures();
+            int age = getAgeFromPath(image.getAbsolutePath());
+            ageToWrinkleFeatureList.add(new AgeToWrinkleFeature(age, wrinkleFeatureResult));
+            System.out.println(String.format("File: %s: Result(age, wrinkle feature): %d | %f", image, age, wrinkleFeatureResult));
         }
         //TODO Grupowanie danych i stworzenie klasyfikatora
     }

@@ -2,6 +2,7 @@ package pl.mateusz.agerecognition.wrinklefeature;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import pl.mateusz.agerecognition.utils.Imshow;
 
 import java.util.List;
 
@@ -69,6 +70,15 @@ public class ImageProcessing {
             Imgproc.rectangle(tempImage, new Point(rectItem.x, rectItem.y)
                     , new Point(rectItem.x + rectItem.width
                             , rectItem.y + rectItem.height), color);
+        }
+    }
+
+    public static void showImage(Mat matToShow, int delay, String label) {
+        Imshow.show(matToShow, label);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

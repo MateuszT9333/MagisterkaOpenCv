@@ -1,6 +1,7 @@
 package pl.mateusz.agerecognition;
 
 import pl.mateusz.agerecognition.utils.Paths;
+import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
 import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;
 
 import java.io.File;
@@ -17,7 +18,12 @@ public class AgeRecognition {
         String[] images = file.list();
 
         for (String image : images) {
-            WrinkleFeature wrinkleFeature = new WrinkleFeature(image);
+            WrinkleFeature wrinkleFeature = null;
+            try {
+                wrinkleFeature = new WrinkleFeature(image, false);
+            } catch (WrinkleFeaturesException e) {
+                e.printStackTrace();
+            }
             int detectedAge = AgeClassifier.detectAgeFromWrinkleFeature(wrinkleFeature.getWrinkleFeatures());
             System.out.println(String.format("Detected age for image %s: %i", image, detectedAge));
         }
