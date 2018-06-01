@@ -15,9 +15,9 @@ public class AgeRecognition {
 
     private static void recognizeAge() {
         File file = new File(imagePath);
-        String[] images = file.list();
+        File[] images = file.listFiles();
 
-        for (String image : images) {
+        for (File image : images) {
             WrinkleFeature wrinkleFeature = null;
             try {
                 wrinkleFeature = new WrinkleFeature(image, false);

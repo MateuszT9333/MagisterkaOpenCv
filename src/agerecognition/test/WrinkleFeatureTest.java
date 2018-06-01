@@ -21,11 +21,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class WrinkleFeatureTest {
 
-    private final static String lenaPath = Paths.testImagesPath + "lena.png";
-    private final static String ryjek = Paths.testImagesPath + "ryjek.jpg";
-    private final static String monalisa = Paths.testImagesPath + "monalisa.jpg";
+    private final static File lenaPath = new File(Paths.testImagesPath + "lena.png");
+    private final static File ryjek = new File(Paths.testImagesPath + "ryjek.jpg");
+    private final static File monalisa = new File(Paths.testImagesPath + "monalisa.jpg");
 
-    String processedImage = Paths.trainingImagesPath + "797100_1917-11-02_1940.jpg";
+    File processedImage = new File(Paths.trainingImagesPath + "25753700_1986-07-23_2011.jpg");
 
     static{
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -89,10 +89,14 @@ public class WrinkleFeatureTest {
     @Test
     public void showGeneratedImages() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
-        fileExists();
+        fileExists(processedImage);
         try {
-            wrinkleFeature = new WrinkleFeature(monalisa, false);
+            wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
+            e.printStackTrace();
+        } catch (Error e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal");
@@ -108,8 +112,8 @@ public class WrinkleFeatureTest {
     }
 
     @Test
-    public void fileExists() {
-        File file = new File(processedImage);
+    public void fileExists(File processedImage) {
+        File file = processedImage;
         assertTrue(file.length() > 0);
     }
 }

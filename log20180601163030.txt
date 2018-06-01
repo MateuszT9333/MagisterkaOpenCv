@@ -1,0 +1,11 @@
+Exception: Path: lena.png
+Success!: Path: monalisa.jpg: (age: -1 | feature: 0,018508
+Success!: Path: ryjek 2.jpg: (age: -1 | feature: 0,028519
+Success!: Path: ryjek 3.jpg: (age: -1 | feature: 0,028519
+WrinkleFeatureException: ryjek 4 — kopia.jpg: No face detected.
+Success!: Path: ryjek 4.jpg: (age: -1 | feature: 0,028519
+Success!: Path: ryjek 5.jpg: (age: -1 | feature: 0,028519
+Success!: Path: ryjek 6.jpg: (age: -1 | feature: 0,028519
+WrinkleFeatureException: ryjek z ficzerami.png: No face detected.
+Success!: Path: ryjek.jpg: (age: -1 | feature: 0,028519
+WrinkleFeatureException: test.jpg: No face detected.

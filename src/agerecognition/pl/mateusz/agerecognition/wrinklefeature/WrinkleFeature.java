@@ -6,6 +6,7 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 import pl.mateusz.agerecognition.utils.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ public class WrinkleFeature {
 
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
-    private final String path;
+    private final File path;
     private final Mat processedMat;
     private float wrinkleFeatures;
     private Mat grayProcessedMat;
@@ -37,14 +38,13 @@ public class WrinkleFeature {
 
     /**
      * Constructor detecting face in image and calculating wrinkle featurer
-     *
-     * @param path path to processed file
+     *  @param path path to processed file
      * @param isCroppedToFace If cropped to face. Especially for training database files
      */
-    public WrinkleFeature(String path, boolean isCroppedToFace) throws WrinkleFeaturesException
-            , NullPointerException {
+    public WrinkleFeature(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
+
         this.path = path;
-        this.processedMat = Imgcodecs.imread(path);
+        this.processedMat = Imgcodecs.imread(path.getAbsolutePath());
 
         if (isCroppedToFace) {
             this.croppedToFace = this.processedMat;
@@ -120,7 +120,7 @@ public class WrinkleFeature {
             ImageProcessing.makeGrayImage(this.grayProcessedMat);
         }
         //Drawing a black rectangle to crop a face
-        addDetectedObjects(Paths.lbpcascadeFrontalFaceDetectorPath
+        addDetectedObjects(Paths.frontalFaceDetectorPath
                 , this.grayProcessedMat
                     , FACES);
 
@@ -143,7 +143,7 @@ public class WrinkleFeature {
         int detectedFaces = detectedObjects.get(FACES).size();
 
         if (detectedFaces > 1) {
-            throw new WrinkleFeaturesException(this.path + ": To much faces for training");
+            throw new WrinkleFeaturesException(this.path.getName() + ": To much faces for training.");
         } else {
             Rect detectedFace = detectedObjects.get(FACES).get(0);
             this.croppedToFace = ImageProcessing.generateCroppedMat(this.grayProcessedMat, detectedFace);
@@ -278,16 +278,16 @@ public class WrinkleFeature {
         if (((kindOfDetectedObject == DetectedObjectsEnum.EYE_PAIR)
                 || (kindOfDetectedObject == DetectedObjectsEnum.NOSE))
                 && sizeOfObjectDetectionList != 1) {
-            throw new WrinkleFeaturesException(this.path + ": Invalid number of detected nose or eye pair.");
+            throw new WrinkleFeaturesException(this.path.getName() + ": Invalid number of detected nose or eye pair.");
         }
         // If detected number of eyes and center of eyes is not equal to throw WrinkleFeaturesException
         if ((kindOfDetectedObject == DetectedObjectsEnum.EYES)
                 && (sizeOfObjectDetectionList != 2)) {
-            throw new WrinkleFeaturesException(this.path + ": Invalid number of detected eyes.");
+            throw new WrinkleFeaturesException(this.path.getName() + ": Invalid number of detected eyes.");
         }
 
         if (kindOfDetectedObject == DetectedObjectsEnum.FACES && sizeOfObjectDetectionList == 0) {
-            throw new WrinkleFeaturesException(this.path + ": No face detected");
+            throw new WrinkleFeaturesException(this.path.getName() + ": No face detected.");
         }
 
         //Mapping kindOfObject e.g. nose to list of Rect which defining coordinates on image of detected objects.
