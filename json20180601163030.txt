@@ -1,1 +1,0 @@
-[{"age":-1,"wrinkleFeature":0.01850808},{"age":-1,"wrinkleFeature":0.028518971},{"age":-1,"wrinkleFeature":0.028518971},{"age":-1,"wrinkleFeature":0.028518971},{"age":-1,"wrinkleFeature":0.028518971},{"age":-1,"wrinkleFeature":0.028518971},{"age":-1,"wrinkleFeature":0.028518971}]
