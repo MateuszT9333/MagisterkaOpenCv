@@ -1,6 +1,8 @@
 package pl.mateusz.agerecognition;
 
 import com.google.gson.Gson;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
 import pl.mateusz.agerecognition.utils.AgeToWrinkleFeature;
 import pl.mateusz.agerecognition.utils.Paths;
 import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
@@ -19,9 +21,11 @@ public class AgeClassifier {
     private final static String trainingPath = Paths.trainingImagesPath;
     private static List<AgeToWrinkleFeature> ageToWrinkleFeatureList = new ArrayList<>();
     private static String logPathPrefix = "log";
-    private static String jsonPathPrefix = "json";
+    private static String ageToWrinkleJsonPath = "ageToWrinkleFeaturesJson";
+    private static String clusteredJsonPath = "clusteredDataJson";
     private static PrintStream log;
-    private static PrintStream json;
+    private static PrintStream ageToWrinkleJson;
+    private static PrintStream clusteredJson;
 
 
     public static void main(String[] args) {
@@ -29,22 +33,13 @@ public class AgeClassifier {
     }
 
     private static void trainImages() {
-        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        String suffixOfFile = timeStamp + ".txt";
-
-        try {
-            log = new PrintStream(new FileOutputStream(new File(logPathPrefix + suffixOfFile)));
-            json = new PrintStream(new FileOutputStream(new File(jsonPathPrefix + suffixOfFile)));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
         long startTime = System.currentTimeMillis();
+
+        initializeOutputFilesWriters();
+
         File file = new File(trainingPath);
         File[] images = file.listFiles();
-        List<String> imagesNotProcessed = new ArrayList<>();
-        List<String> imageProcessed = new ArrayList<>();
+
         int invalidProcessedImages = 0;
         int validProcessedImages = 0;
 
@@ -86,26 +81,64 @@ public class AgeClassifier {
             log.println(succesfullProcessedMessage);
             System.out.println(succesfullProcessedMessage);
         }
-        objectsToJSON(ageToWrinkleFeatureList);
-        System.out.println("\n\nCorrectly processed images: " + validProcessedImages);
-        System.out.println("Incorrectly processed images: " + invalidProcessedImages);
-        System.out.println("Sum of processed images: " + (invalidProcessedImages + validProcessedImages));
-        System.out.println("Execution time: " + ((float) (System.currentTimeMillis() - startTime) / 1000) + " s");
+
+        generateStats(startTime, invalidProcessedImages, validProcessedImages);
+
+        objectsToJSON(ageToWrinkleFeatureList, ageToWrinkleJson);
+        clusterData();
     }
 
-    private static void objectsToJSON(Object... objects) {
-        Gson gson = new Gson();
+    private static void generateStats(long startTime, int invalidProcessedImages, int validProcessedImages) {
+        String correctlyProcessedImages = "\n\nCorrectly processed images: " + validProcessedImages;
+        String incorrectlyProcessedImages = "Incorrectly processed images: " + invalidProcessedImages;
+        String processedImages = "Sum of processed images: " + (invalidProcessedImages + validProcessedImages);
+        String exexutionTime = "Execution time: " + ((float) (System.currentTimeMillis() - startTime) / 1000) + " s";
 
-        for (Object object : objects) {
-            String jsonString = gson.toJson(object);
-            json.println(jsonString);
+        System.out.println(correctlyProcessedImages);
+        System.out.println(incorrectlyProcessedImages);
+        System.out.println(processedImages);
+        System.out.println(exexutionTime);
+
+        log.println(correctlyProcessedImages);
+        log.println(incorrectlyProcessedImages);
+        log.println(processedImages);
+        log.println(exexutionTime);
+    }
+
+    private static void initializeOutputFilesWriters() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String suffixOfFile = timeStamp + ".txt";
+
+        try {
+            log = new PrintStream(new FileOutputStream(new File(logPathPrefix + suffixOfFile)));
+            ageToWrinkleJson = new PrintStream(new FileOutputStream(new File(ageToWrinkleJsonPath + suffixOfFile)));
+            clusteredJson = new PrintStream(new FileOutputStream(new File(clusteredJsonPath + suffixOfFile)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
+    }
+
+    private static void clusterData() {
+        FuzzyKMeansClusterer fuzzyKMeansClusterer = new FuzzyKMeansClusterer(5, 10);
+        fuzzyKMeansClusterer.cluster(ageToWrinkleFeatureList);
+        List<CentroidCluster> listOfCentroids = fuzzyKMeansClusterer.getClusters();
+        objectsToJSON(listOfCentroids, clusteredJson);
+    }
+
+    private static void objectsToJSON(Object object, PrintStream json) {
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(object);
+        json.println(jsonString);
     }
 
 
     private static byte getAgeFromPath(String image) {
-        //TODO Wyznacz wiek na podstawie sciezki zdjecia
-        return -1;
+        try {
+            return Byte.parseByte(image.subSequence(0, 2).toString());
+        } catch (NumberFormatException e) {
+            System.err.println("NumberFormatException: " + image);
+            return -1;
+        }
     }
 
     /**

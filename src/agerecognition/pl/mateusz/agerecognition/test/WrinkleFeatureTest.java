@@ -1,5 +1,5 @@
 
-package test;
+package pl.mateusz.agerecognition.test;
 
 import org.junit.Test;
 import org.opencv.core.Core;
