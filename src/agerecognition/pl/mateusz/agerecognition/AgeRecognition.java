@@ -1,5 +1,6 @@
 package pl.mateusz.agerecognition;
 
+import pl.mateusz.agerecognition.train.AgeClassifier;
 import pl.mateusz.agerecognition.utils.Paths;
 import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
 import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;

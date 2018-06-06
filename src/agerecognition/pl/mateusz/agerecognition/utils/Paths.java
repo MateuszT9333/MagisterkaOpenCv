@@ -17,4 +17,9 @@ public class Paths {
     public final static String eyesDetectorPath = xmlPath + "haarcascade_eyes.xml";
     public final static String ageToRecognizePath = resourcesPath + "ageToRecognize/";
     public final static String nullJpg = resourcesPath + "utils/null.jpg";
+    public final static String pathToDump = "dump/";
+    public static final String logPathPrefix = pathToDump + "log";
+    public static final String ageToWrinkleJsonPath = pathToDump + "ageToWrinkleFeaturesJson";
+    public static final String clusteredJsonPath = pathToDump + "clusteredDataJson";
+    public static final String mergedAgeToWrinkleFeaturesPath = pathToDump + "mergedAgeToWrinkleFeatureJson";
 }
