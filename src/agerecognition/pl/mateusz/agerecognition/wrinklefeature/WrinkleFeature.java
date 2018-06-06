@@ -38,7 +38,8 @@ public class WrinkleFeature {
 
     /**
      * Constructor detecting face in image and calculating wrinkle featurer
-     *  @param path path to processed file
+     *
+     * @param path            path to processed file
      * @param isCroppedToFace If cropped to face. Especially for training database files
      */
     public WrinkleFeature(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
@@ -53,7 +54,7 @@ public class WrinkleFeature {
             return;
         }
         faceDetector();
-            cropToFace();
+        cropToFace();
         detectPairOfEyesAndNose();
         calculateWrinkleFeatures();
 
@@ -122,7 +123,7 @@ public class WrinkleFeature {
         //Drawing a black rectangle to crop a face
         addDetectedObjects(Paths.frontalFaceDetectorPath
                 , this.grayProcessedMat
-                    , FACES);
+                , FACES);
 
     }
 
@@ -222,7 +223,7 @@ public class WrinkleFeature {
 
     private void detectEyes(Mat croppedImage) throws WrinkleFeaturesException {
         addDetectedObjects(Paths.eyesDetectorPath, croppedImage
-                    , DetectedObjectsEnum.EYES);
+                , DetectedObjectsEnum.EYES);
 
         List<Rect> listOfEyesRectangles = detectedObjects.get(DetectedObjectsEnum.EYES);
 
@@ -236,23 +237,24 @@ public class WrinkleFeature {
 
     private void detectEyesPair(Mat croppedImage) throws WrinkleFeaturesException {
         addDetectedObjects(Paths.eyePairDetectorPath, croppedImage
-                    , DetectedObjectsEnum.EYE_PAIR);
+                , DetectedObjectsEnum.EYE_PAIR);
 
-        }
+    }
 
 
     private void detectNose(Mat croppedImage) throws WrinkleFeaturesException {
-            addDetectedObjects(Paths.noseDetectorPath, croppedImage
-                    , DetectedObjectsEnum.NOSE);
+        addDetectedObjects(Paths.noseDetectorPath, croppedImage
+                , DetectedObjectsEnum.NOSE);
 
     }
 
 
     /**
      * Method changing to Mat which include detected objects.
+     *
      * @param cascadeClassifierPath cascadeClassifierPath
-     * @param image image
-     * @param kindOfDetectedObject kindOfDetectedObject
+     * @param image                 image
+     * @param kindOfDetectedObject  kindOfDetectedObject
      * @throws WrinkleFeaturesException when invalid number of detected objects
      */
 

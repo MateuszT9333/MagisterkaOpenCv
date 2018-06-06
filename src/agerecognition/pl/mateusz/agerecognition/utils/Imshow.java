@@ -112,9 +112,8 @@ public class Imshow {
      * Sets whether this window should be resizable or not, by default it is not
      * resizable
      *
-     * @param resizable
-     *            <code>true</code> if the window should be resizable,
-     *            <code>false</code> otherwise
+     * @param resizable <code>true</code> if the window should be resizable,
+     *                  <code>false</code> otherwise
      */
     public void setResizable(boolean resizable) {
         Window.setResizable(resizable);
@@ -124,8 +123,7 @@ public class Imshow {
     /**
      * Displays the given {@link Mat} in a new instance of {@link Imshow}
      *
-     * @param mat
-     *            the {@link Mat} to display
+     * @param mat the {@link Mat} to display
      */
     public static void show(Mat mat) {
         show(mat, new Dimension(mat.rows(), mat.cols()), "", false,
@@ -136,10 +134,8 @@ public class Imshow {
      * Displays the given {@link Mat} in a new instance of {@link Imshow} with
      * the given title as the title for the window
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameTitle
-     *            the title for the frame
+     * @param mat        the {@link Mat} to display
+     * @param frameTitle the title for the frame
      */
     public static void show(Mat mat, String frameTitle) {
         show(mat, new Dimension(mat.rows(), mat.cols()), frameTitle, false,
@@ -151,12 +147,9 @@ public class Imshow {
      * the given title as the title for the window and determines whether the
      * frame is resizable or not
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameTitle
-     *            the title for the frame
-     * @param resizable
-     *            whether the frame should be resizable or not
+     * @param mat        the {@link Mat} to display
+     * @param frameTitle the title for the frame
+     * @param resizable  whether the frame should be resizable or not
      */
     public static void show(Mat mat, String frameTitle, boolean resizable) {
         show(mat, new Dimension(mat.rows(), mat.cols()), frameTitle, resizable,
@@ -167,10 +160,8 @@ public class Imshow {
      * Displays the given {@link Mat} in a new instance of {@link Imshow} with a
      * set size
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameSize
-     *            the size for the frame
+     * @param mat       the {@link Mat} to display
+     * @param frameSize the size for the frame
      */
     public static void show(Mat mat, Dimension frameSize) {
         show(mat, frameSize, "", false, WindowConstants.EXIT_ON_CLOSE);
@@ -180,12 +171,9 @@ public class Imshow {
      * Displays the given {@link Mat} in a new instance of {@link Imshow} with a
      * set size and given title
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameSize
-     *            the size for the frame
-     * @param frameTitle
-     *            the title for the frame
+     * @param mat        the {@link Mat} to display
+     * @param frameSize  the size for the frame
+     * @param frameTitle the title for the frame
      */
     public static void show(Mat mat, Dimension frameSize, String frameTitle) {
         show(mat, frameSize, frameTitle, false, WindowConstants.EXIT_ON_CLOSE);
@@ -195,12 +183,9 @@ public class Imshow {
      * Displays the given {@link Mat} in a new instance of {@link Imshow} with a
      * set size and given title and whether it is resizable or not
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameSize
-     *            the size for the frame
-     * @param frameTitle
-     *            the title for the frame
+     * @param mat        the {@link Mat} to display
+     * @param frameSize  the size for the frame
+     * @param frameTitle the title for the frame
      */
     public static void show(Mat mat, Dimension frameSize, String frameTitle,
                             boolean resizable) {
@@ -213,16 +198,11 @@ public class Imshow {
      * set size and given title and whether it is resizable or not, and with the
      * close operation set
      *
-     * @param mat
-     *            the {@link Mat} to display
-     * @param frameSize
-     *            the size for the frame
-     * @param frameTitle
-     *            the title for the frame
-     * @param resizable
-     *            wether the frame is resizable or not
-     * @param closeOperation
-     *            the constant for the default close operation of the frame
+     * @param mat            the {@link Mat} to display
+     * @param frameSize      the size for the frame
+     * @param frameTitle     the title for the frame
+     * @param resizable      wether the frame is resizable or not
+     * @param closeOperation the constant for the default close operation of the frame
      */
     public static void show(Mat mat, Dimension frameSize, String frameTitle,
                             boolean resizable, int closeOperation) {

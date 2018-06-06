@@ -20,7 +20,7 @@ class DetectFaceDemo {
         // directory.
         CascadeClassifier faceDetector = new CascadeClassifier(resourcesPath + "/xml/lbpcascade_frontalface.xml");
         Mat image = Imgcodecs.imread(resourcesPath + "/testImages/lena.png");
-        Imshow.show(image,"Cudowna Lena");
+        Imshow.show(image, "Cudowna Lena");
 
         // Detect faces in the image.
         // MatOfRect is a special container class for Rect.
@@ -33,7 +33,7 @@ class DetectFaceDemo {
         for (Rect rect : faceDetections.toArray()) {
             Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
         }
-        Imshow.show(image,"Cudowna Lena");
+        Imshow.show(image, "Cudowna Lena");
         // Save the visualized detection.
         String filename = savedImages + "/faceDetection.png";
         System.out.println(String.format("Writing %s", filename));

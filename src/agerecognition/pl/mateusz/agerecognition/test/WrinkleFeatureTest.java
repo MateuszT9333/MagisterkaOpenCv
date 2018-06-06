@@ -25,9 +25,9 @@ public class WrinkleFeatureTest {
     private final static File ryjek = new File(Paths.testImagesPath + "ryjek.jpg");
     private final static File monalisa = new File(Paths.testImagesPath + "monalisa.jpg");
 
-    File processedImage = new File(Paths.trainingImagesPath + "25753700_1986-07-23_2011.jpg");
+    File processedImage = ryjek;
 
-    static{
+    static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
@@ -68,9 +68,9 @@ public class WrinkleFeatureTest {
         Thread.sleep(20000);
     }
 
-    void showImage(String imagePath, String frameTitle){
+    void showImage(String imagePath, String frameTitle) {
         Mat image = Imgcodecs.imread(imagePath);
-        Imshow.show(image,frameTitle);
+        Imshow.show(image, frameTitle);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class WrinkleFeatureTest {
     @Test
     public void showGeneratedImages() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
-        fileExists(processedImage);
+        //fileExists(processedImage);
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
