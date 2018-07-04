@@ -20,6 +20,7 @@ public class AgeClassifier {
     private static PrintStream ageToWrinkleJson;
     private static PrintStream clusteredJson;
     private static PrintStream mergedJson;
+    private static PrintStream matlabDat;
 
 
     public static void generateDataFromImages(String trainingSetPrefix, String subPathOfImages) {
@@ -159,31 +160,58 @@ public class AgeClassifier {
     /**
      * Cluster data by age to wrinkle features set
      *
-     * @param trainingSetPath
+     * @param mergedAgeToWrinkleFeatureJsonPath
      */
-    public static void clusterDataByFuzzyKMeans(String trainingSetPath) {
+    public static void clusterDataByFuzzyKMeans(String mergedAgeToWrinkleFeatureJsonPath) {
         List<AgeToWrinkleFeature> ageToWrinkleFeatures = new ArrayList<>();
         Gson gson = new Gson();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         try {
             clusteredJson = new PrintStream(new FileOutputStream(
-                    new File(Paths.clusteredJsonPath + trainingSetPath + ".txt")));
-            mergedJson = new PrintStream(new FileOutputStream(
-                    new File(Paths.mergedAgeToWrinkleFeaturesPath + trainingSetPath + ".txt")));
+                    new File(Paths.clusteredJsonPath + timeStamp + ".txt")));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        //First line of .txt
+        clusteredJson.println("Clustered from: " + mergedAgeToWrinkleFeatureJsonPath);
 
+        try (BufferedReader br = new BufferedReader(new FileReader(mergedAgeToWrinkleFeatureJsonPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                ageToWrinkleFeatures.add(gson.fromJson(line, AgeToWrinkleFeature.class));
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        clusterDataByFuzzyKMeans(ageToWrinkleFeatures);
+    }
+
+    public static void mergeAgeToWrinkleFeaturesFromJsons(String trainingSetPath) {
+        try {
+            mergedJson = new PrintStream(new FileOutputStream(
+                    new File(Paths.mergedAgeToWrinkleFeaturesPath + trainingSetPath + ".txt")));
+            matlabDat = new PrintStream(new FileOutputStream(
+                    new File(Paths.mergedAgeToWrinkleFeaturesPath + trainingSetPath + ".dat")));
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         File file = new File(Paths.pathToDump);
+
         File[] listOfFiles = file.listFiles(pathname -> pathname.getName().
                 contains("ageToWrinkleFeaturesJson" + trainingSetPath));
-
         for (File json : listOfFiles) {
 
             try (BufferedReader br = new BufferedReader(new FileReader(json))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    ageToWrinkleFeatures.add(gson.fromJson(line, AgeToWrinkleFeature.class));
+                    mergedJson.println(line);
+                    matlabDat.println(matlabRecordFromJson(line));
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -191,10 +219,15 @@ public class AgeClassifier {
                 e.printStackTrace();
             }
         }
-        for (AgeToWrinkleFeature ageToWrinkleFeature : ageToWrinkleFeatures) {
-            mergedJson.println(gson.toJson(ageToWrinkleFeature));
-        }
-        clusterDataByFuzzyKMeans(ageToWrinkleFeatures);
+    }
 
+    private static String matlabRecordFromJson(String line) {
+        Gson gson = new Gson();
+
+        AgeToWrinkleFeature ageToWrinkleFeature = gson.fromJson(line, AgeToWrinkleFeature.class);
+
+        return String.format("   %s   %s"
+                , ageToWrinkleFeature.age
+                , ageToWrinkleFeature.wrinkleFeature);
     }
 }
