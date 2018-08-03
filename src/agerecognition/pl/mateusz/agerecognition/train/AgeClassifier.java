@@ -154,7 +154,9 @@ public class AgeClassifier {
      */
     public static int detectAgeFromWrinkleFeature(float wrinkleFeature) {
         //TODO Wykrywanie wieku na podstawie klasyfikatora
-        return 0;
+        return (int) (1 / (Math.pow(wrinkleFeature, 2) * 1.98531412899040e-05
+                + 0.000912187996975040 * wrinkleFeature
+                + 0.000963979767558933));
     }
 
     /**

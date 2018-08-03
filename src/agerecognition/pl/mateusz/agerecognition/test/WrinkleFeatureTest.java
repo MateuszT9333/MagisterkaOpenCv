@@ -13,19 +13,17 @@ import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Mateusz Trzeciak
  * Some tests...
  */
 public class WrinkleFeatureTest {
 
-    private final static File lenaPath = new File(Paths.testImagesPath + "lena.png");
+    private final static File obraz = new File(Paths.testImagesPath + "1_0_0_20161219194756275.jpg");
     private final static File ryjek = new File(Paths.testImagesPath + "ryjek.jpg");
     private final static File monalisa = new File(Paths.testImagesPath + "monalisa.jpg");
 
-    File processedImage = ryjek;
+    File processedImage = obraz;
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -77,7 +75,7 @@ public class WrinkleFeatureTest {
     public void calculateWrinkleFeaturesTest() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
         try {
-            wrinkleFeature = new WrinkleFeature(monalisa, false);
+            wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
@@ -111,9 +109,9 @@ public class WrinkleFeatureTest {
         Thread.sleep(1000000);
     }
 
-    @Test
-    public void fileExists(File processedImage) {
-        File file = processedImage;
-        assertTrue(file.length() > 0);
-    }
+//    @Test
+//    public void fileExists(File processedImage) {
+//        File file = processedImage;
+//        assertTrue(file.length() > 0);
+//    }
 }

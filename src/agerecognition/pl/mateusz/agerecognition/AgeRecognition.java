@@ -25,8 +25,9 @@ public class AgeRecognition {
             } catch (WrinkleFeaturesException e) {
                 e.printStackTrace();
             }
+            assert wrinkleFeature != null;
             int detectedAge = AgeClassifier.detectAgeFromWrinkleFeature(wrinkleFeature.getWrinkleFeatures());
-            System.out.println(String.format("Detected age for image %s: %i", image, detectedAge));
+            System.out.println(String.format("Detected age for image %s: %d", image, detectedAge));
         }
     }
 
