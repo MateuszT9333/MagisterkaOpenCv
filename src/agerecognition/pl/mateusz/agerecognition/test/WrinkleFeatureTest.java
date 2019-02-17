@@ -21,7 +21,6 @@ public class WrinkleFeatureTest {
 
     private final static File obraz = new File(Paths.testImagesPath + "1_0_0_20161219194756275.jpg");
     private final static File ryjek = new File(Paths.testImagesPath + "ryjek.jpg");
-    private final static File monalisa = new File(Paths.testImagesPath + "monalisa.jpg");
 
     File processedImage = obraz;
 

@@ -163,6 +163,7 @@ public class AgeClassifier {
      * Cluster data by age to wrinkle features set
      *
      * @param mergedAgeToWrinkleFeatureJsonPath
+     * @info Program zawiesza się, więc obliczanie clusterow odbywa się za pomocą Matlaba
      */
     public static void clusterDataByFuzzyKMeans(String mergedAgeToWrinkleFeatureJsonPath) {
         List<AgeToWrinkleFeature> ageToWrinkleFeatures = new ArrayList<>();
@@ -205,8 +206,9 @@ public class AgeClassifier {
         }
         File file = new File(Paths.pathToDump);
 
-        File[] listOfFiles = file.listFiles(pathname -> pathname.getName().
-                contains("ageToWrinkleFeaturesJson" + trainingSetPath));
+        File[] listOfFiles = file.listFiles(pathname -> pathname.getName()
+                .contains("ageToWrinkleFeaturesJson" + trainingSetPath));
+        assert listOfFiles != null;
         for (File json : listOfFiles) {
 
             try (BufferedReader br = new BufferedReader(new FileReader(json))) {
@@ -215,8 +217,6 @@ public class AgeClassifier {
                     mergedJson.println(line);
                     matlabDat.println(matlabRecordFromJson(line));
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
