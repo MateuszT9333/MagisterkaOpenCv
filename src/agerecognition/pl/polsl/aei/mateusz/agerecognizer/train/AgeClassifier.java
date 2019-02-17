@@ -1,12 +1,12 @@
-package pl.mateusz.agerecognition.train;
+package pl.polsl.aei.mateusz.agerecognizer.train;
 
 import com.google.gson.Gson;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
-import pl.mateusz.agerecognition.utils.AgeToWrinkleFeature;
-import pl.mateusz.agerecognition.utils.Paths;
-import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
-import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.utils.AgeToWrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

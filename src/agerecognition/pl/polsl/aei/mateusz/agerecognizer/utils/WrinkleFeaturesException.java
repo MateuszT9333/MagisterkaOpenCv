@@ -1,4 +1,4 @@
-package pl.mateusz.agerecognition.utils;
+package pl.polsl.aei.mateusz.agerecognizer.utils;
 
 
 public class WrinkleFeaturesException extends Exception {

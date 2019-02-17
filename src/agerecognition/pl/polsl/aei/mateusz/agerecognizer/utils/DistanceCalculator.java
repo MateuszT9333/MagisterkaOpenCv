@@ -1,7 +1,7 @@
 /**
  * @author Mateusz Trzeciak
  */
-package pl.mateusz.agerecognition.utils;
+package pl.polsl.aei.mateusz.agerecognizer.utils;
 
 import org.opencv.core.Point;
 import org.opencv.core.Rect;

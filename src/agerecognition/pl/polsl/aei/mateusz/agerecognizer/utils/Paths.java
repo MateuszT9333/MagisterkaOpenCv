@@ -2,9 +2,9 @@
  * @author Mateusz Trzeciak
  * Paths to files in resources
  */
-package pl.mateusz.agerecognition.utils;
+package pl.polsl.aei.mateusz.agerecognizer.utils;
 
-public class Paths {
+public class Paths { //TODO zmienic sciezki
     public final static String resourcesPath = "src/resources/";
     public final static String testImagesPath = resourcesPath + "testImages/";
     public final static String trainingImagesPath = resourcesPath + "trainingImages/";

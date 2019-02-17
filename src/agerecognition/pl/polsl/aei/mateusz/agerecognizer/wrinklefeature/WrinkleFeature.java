@@ -1,10 +1,10 @@
-package pl.mateusz.agerecognition.wrinklefeature;
+package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
-import pl.mateusz.agerecognition.utils.*;
+import pl.polsl.aei.mateusz.agerecognizer.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static pl.mateusz.agerecognition.utils.DetectedObjectsEnum.*;
+import static pl.polsl.aei.mateusz.agerecognizer.utils.DetectedObjectsEnum.*;
 
 /**
  * @author Mateusz Trzeciak

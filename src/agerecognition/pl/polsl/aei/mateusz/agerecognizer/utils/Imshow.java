@@ -5,11 +5,11 @@
  * Make sure OpenCV Java is in your Build Path
  * Usage :
  * -------
- * pl.mateusz.agerecognition.utils.Imshow ims = new pl.mateusz.agerecognition.utils.Imshow("Title");
+ * Imshow ims = new Imshow("Title");
  * ims.showImage(Mat image);
  * Check Example for usage with Webcam Live Video Feed
  */
-package pl.mateusz.agerecognition.utils;
+package pl.polsl.aei.mateusz.agerecognizer.utils;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Size;

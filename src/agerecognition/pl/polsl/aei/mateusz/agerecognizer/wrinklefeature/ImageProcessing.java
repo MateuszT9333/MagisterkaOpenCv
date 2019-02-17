@@ -1,8 +1,8 @@
-package pl.mateusz.agerecognition.wrinklefeature;
+package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
-import pl.mateusz.agerecognition.utils.Imshow;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 
 import java.util.List;
 

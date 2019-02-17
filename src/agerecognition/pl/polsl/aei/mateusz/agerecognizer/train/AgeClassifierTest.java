@@ -1,7 +1,7 @@
-package pl.mateusz.agerecognition.train;
+package pl.polsl.aei.mateusz.agerecognizer.train;
 
 import org.junit.Test;
-import pl.mateusz.agerecognition.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
 
 import java.io.File;
 

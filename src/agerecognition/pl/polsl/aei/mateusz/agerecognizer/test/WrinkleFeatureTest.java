@@ -1,15 +1,15 @@
 
-package pl.mateusz.agerecognition.test;
+package pl.polsl.aei.mateusz.agerecognizer.test;
 
 import org.junit.Test;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
-import pl.mateusz.agerecognition.utils.Imshow;
-import pl.mateusz.agerecognition.utils.Paths;
-import pl.mateusz.agerecognition.utils.WrinkleFeaturesException;
-import pl.mateusz.agerecognition.wrinklefeature.WrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
 import java.io.File;
 
