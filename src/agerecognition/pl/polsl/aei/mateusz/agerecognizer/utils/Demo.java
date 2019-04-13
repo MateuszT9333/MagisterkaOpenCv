@@ -5,6 +5,8 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
+import javax.swing.*;
+
 //
 // Detects faces in an image, draws boxes around them, and writes the results
 // to "faceDetection.png".
@@ -20,7 +22,7 @@ class DetectFaceDemo {
         // directory.
         CascadeClassifier faceDetector = new CascadeClassifier(resourcesPath + "/xml/lbpcascade_frontalface.xml");
         Mat image = Imgcodecs.imread(resourcesPath + "/testImages/lena.png");
-        Imshow.show(image, "Cudowna Lena");
+        Imshow.show(image, "Lena", WindowConstants.DO_NOTHING_ON_CLOSE);
 
         // Detect faces in the image.
         // MatOfRect is a special container class for Rect.
@@ -33,7 +35,7 @@ class DetectFaceDemo {
         for (Rect rect : faceDetections.toArray()) {
             Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
         }
-        Imshow.show(image, "Cudowna Lena");
+        Imshow.show(image, "Cudowna Lena", WindowConstants.DO_NOTHING_ON_CLOSE);
         // Save the visualized detection.
         String filename = savedImages + "/faceDetection.png";
         System.out.println(String.format("Writing %s", filename));

@@ -7,10 +7,11 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
-import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
+import javax.swing.*;
 import java.io.File;
 
 /**
@@ -19,10 +20,9 @@ import java.io.File;
  */
 public class WrinkleFeatureTest {
 
-    private final static File obraz = new File(Paths.testImagesPath + "1_0_0_20161219194756275.jpg");
-    private final static File ryjek = new File(Paths.testImagesPath + "ryjek.jpg");
+    private final static File mojaTwarz = new File(new PropertiesLoader().getProperty("mojaTwarz"));
 
-    File processedImage = obraz;
+    File processedImage = mojaTwarz;
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -32,24 +32,24 @@ public class WrinkleFeatureTest {
     public void faceDetectorTest() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
         try {
-            wrinkleFeature = new WrinkleFeature(ryjek, false);
+            wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
-        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal");
-        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face");
-        Thread.sleep(20000);
+        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
+//        Thread.sleep(20000);
     }
 
     @Test
     public void detectPairOfEyesNoseTest() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
         try {
-            wrinkleFeature = new WrinkleFeature(ryjek, false);
+            wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
-        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes");
+        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
         Thread.sleep(20000);
     }
 
@@ -57,17 +57,17 @@ public class WrinkleFeatureTest {
     public void detectEdgesTest() throws InterruptedException {
         WrinkleFeature wrinkleFeature = null;
         try {
-            wrinkleFeature = new WrinkleFeature(ryjek, false);
+            wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
-        Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges");
+        Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         Thread.sleep(20000);
     }
 
     void showImage(String imagePath, String frameTitle) {
         Mat image = Imgcodecs.imread(imagePath);
-        Imshow.show(image, frameTitle);
+        Imshow.show(image, frameTitle, WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
     @Test
@@ -89,17 +89,13 @@ public class WrinkleFeatureTest {
         //fileExists(processedImage);
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
-        } catch (WrinkleFeaturesException e) {
-            e.printStackTrace();
-        } catch (Error e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
-        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal");
-        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face");
-        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes");
-        Imshow.show(wrinkleFeature.getDetectedEdges(), "Detected edges");
+        Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeature.getDetectedEdges(), "Detected edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         wrinkleFeature.showWrinkleAreas(new Scalar(255, 0, 0));
 
         System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());

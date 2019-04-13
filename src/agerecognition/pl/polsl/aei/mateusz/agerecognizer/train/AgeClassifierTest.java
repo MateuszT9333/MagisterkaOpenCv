@@ -1,7 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer.train;
 
 import org.junit.Test;
-import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
 
@@ -14,7 +14,7 @@ public class AgeClassifierTest {
     @Test
     public void generateDataFromImagesAuto() throws InterruptedException {
         boolean process = false;
-        File images = new File(Paths.trainingImagesPath);
+        File images = new File(new PropertiesLoader().getProperty("trainingImagesPath"));
         String startFrom = "19";
         for (File image : images.listFiles()) {
 

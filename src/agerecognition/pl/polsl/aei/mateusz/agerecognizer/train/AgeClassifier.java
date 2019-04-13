@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.apache.commons.math3.ml.clustering.FuzzyKMeansClusterer;
 import pl.polsl.aei.mateusz.agerecognizer.utils.AgeToWrinkleFeature;
-import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
@@ -27,7 +27,7 @@ public class AgeClassifier {
 
         long startTime = System.currentTimeMillis();
 
-        File file = new File(Paths.trainingImagesPath + subPathOfImages);
+        File file = new File(new PropertiesLoader().getProperty("trainingImagesPath") + subPathOfImages);
         File[] images = file.listFiles(pathname -> pathname.getName().contains("."));
         if (images.length == 0) {
             System.err.println("No files in this subfolder!");
@@ -103,8 +103,8 @@ public class AgeClassifier {
         String suffixOfFile = trainingSetPrefix + "_" + timeStamp + "_" + subPathOfImages + ".txt";
 
         try {
-            log = new PrintStream(new FileOutputStream(new File(Paths.logPathPrefix + suffixOfFile)));
-            ageToWrinkleJson = new PrintStream(new FileOutputStream(new File(Paths.ageToWrinkleJsonPath + suffixOfFile)));
+            log = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("logPathPrefix") + suffixOfFile)));
+            ageToWrinkleJson = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -172,7 +172,7 @@ public class AgeClassifier {
 
         try {
             clusteredJson = new PrintStream(new FileOutputStream(
-                    new File(Paths.clusteredJsonPath + timeStamp + ".txt")));
+                    new File(new PropertiesLoader().getProperty("clusteredJsonPath") + timeStamp + ".txt")));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -197,14 +197,14 @@ public class AgeClassifier {
     public static void mergeAgeToWrinkleFeaturesFromJsons(String trainingSetPath) {
         try {
             mergedJson = new PrintStream(new FileOutputStream(
-                    new File(Paths.mergedAgeToWrinkleFeaturesPath + trainingSetPath + ".txt")));
+                    new File(new PropertiesLoader().getProperty("mergedAgeToWrinkleFeaturesPath") + trainingSetPath + ".txt")));
             matlabDat = new PrintStream(new FileOutputStream(
-                    new File(Paths.mergedAgeToWrinkleFeaturesPath + trainingSetPath + ".dat")));
+                    new File(new PropertiesLoader().getProperty("mergedAgeToWrinkleFeaturesPath") + trainingSetPath + ".dat")));
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        File file = new File(Paths.pathToDump);
+        File file = new File(new PropertiesLoader().getProperty("pathToDump"));
 
         File[] listOfFiles = file.listFiles(pathname -> pathname.getName()
                 .contains("ageToWrinkleFeaturesJson" + trainingSetPath));

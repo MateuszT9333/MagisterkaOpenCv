@@ -1,7 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer;
 
 import pl.polsl.aei.mateusz.agerecognizer.train.AgeClassifier;
-import pl.polsl.aei.mateusz.agerecognizer.utils.Paths;
+import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
@@ -11,7 +11,7 @@ import java.io.File;
  * Recognizing Age from selected image
  */
 public class AgeRecognition {
-    private final static String imagePath = Paths.ageToRecognizePath;
+    private final static String imagePath = new PropertiesLoader().getProperty("ageToRecognizePath");
 
     public static void main(String[] args) {
         recognizeAge();

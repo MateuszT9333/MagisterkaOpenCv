@@ -97,7 +97,7 @@ public class Imshow {
 
         switch (option) {
             case 0:
-                Window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                Window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 break;
             case 1:
                 Window.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
@@ -137,9 +137,9 @@ public class Imshow {
      * @param mat        the {@link Mat} to display
      * @param frameTitle the title for the frame
      */
-    public static void show(Mat mat, String frameTitle) {
+    public static void show(Mat mat, String frameTitle, int closeOp) {
         show(mat, new Dimension(mat.rows(), mat.cols()), frameTitle, false,
-                WindowConstants.EXIT_ON_CLOSE);
+                closeOp);
     }
 
     /**

@@ -4,6 +4,7 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 
+import javax.swing.*;
 import java.util.List;
 
 public class ImageProcessing {
@@ -74,7 +75,7 @@ public class ImageProcessing {
     }
 
     public static void showImage(Mat matToShow, int delay, String label) {
-        Imshow.show(matToShow, label);
+        Imshow.show(matToShow, label, WindowConstants.DO_NOTHING_ON_CLOSE);
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
