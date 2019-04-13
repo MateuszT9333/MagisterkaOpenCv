@@ -1,4 +1,3 @@
-
 package pl.polsl.aei.mateusz.agerecognizer.test;
 
 import org.junit.Test;
@@ -13,6 +12,7 @@ import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.Scanner;
 
 /**
  * @author Mateusz Trzeciak
@@ -22,14 +22,14 @@ public class WrinkleFeatureTest {
 
     private final static File mojaTwarz = new File(new PropertiesLoader().getProperty("mojaTwarz"));
 
-    File processedImage = mojaTwarz;
-
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
+    File processedImage = mojaTwarz;
+
     @Test
-    public void faceDetectorTest() throws InterruptedException {
+    public void faceDetectorTest() {
         WrinkleFeature wrinkleFeature = null;
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
@@ -38,11 +38,17 @@ public class WrinkleFeatureTest {
         }
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
-//        Thread.sleep(20000);
+        pause();
+    }
+
+    private void pause() {
+        System.out.println("Press \"ENTER\" to continue...");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
     }
 
     @Test
-    public void detectPairOfEyesNoseTest() throws InterruptedException {
+    public void detectPairOfEyesNoseTest() {
         WrinkleFeature wrinkleFeature = null;
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
@@ -50,11 +56,11 @@ public class WrinkleFeatureTest {
             e.printStackTrace();
         }
         Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
-        Thread.sleep(20000);
+        pause();
     }
 
     @Test
-    public void detectEdgesTest() throws InterruptedException {
+    public void detectEdgesTest() {
         WrinkleFeature wrinkleFeature = null;
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
@@ -62,7 +68,7 @@ public class WrinkleFeatureTest {
             e.printStackTrace();
         }
         Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
-        Thread.sleep(20000);
+        pause();
     }
 
     void showImage(String imagePath, String frameTitle) {
@@ -71,7 +77,7 @@ public class WrinkleFeatureTest {
     }
 
     @Test
-    public void calculateWrinkleFeaturesTest() throws InterruptedException {
+    public void calculateWrinkleFeaturesTest() {
         WrinkleFeature wrinkleFeature = null;
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
@@ -80,11 +86,11 @@ public class WrinkleFeatureTest {
         }
         wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
         System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
-        Thread.sleep(20000);
+        pause();
     }
 
     @Test
-    public void showGeneratedImages() throws InterruptedException {
+    public void showGeneratedImages() {
         WrinkleFeature wrinkleFeature = null;
         //fileExists(processedImage);
         try {
@@ -101,7 +107,7 @@ public class WrinkleFeatureTest {
         System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
         System.out.println("Detected objects " + wrinkleFeature.getDetectedObjects());
         System.out.println("Calculated wrinkle areas " + wrinkleFeature.getWrinkleAreas());
-        Thread.sleep(1000000);
+        pause();
     }
 
 //    @Test
