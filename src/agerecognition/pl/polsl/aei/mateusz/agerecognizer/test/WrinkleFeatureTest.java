@@ -21,12 +21,11 @@ import java.util.Scanner;
 public class WrinkleFeatureTest {
 
     private final static File mojaTwarz = new File(new PropertiesLoader().getProperty("mojaTwarz"));
+    private File processedImage = mojaTwarz;
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
-
-    File processedImage = mojaTwarz;
 
     @Test
     public void faceDetectorTest() {
@@ -36,6 +35,7 @@ public class WrinkleFeatureTest {
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
+        assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
         pause();
@@ -55,6 +55,7 @@ public class WrinkleFeatureTest {
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
+        assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
         pause();
     }
@@ -67,6 +68,7 @@ public class WrinkleFeatureTest {
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
+        assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         pause();
     }
@@ -84,6 +86,7 @@ public class WrinkleFeatureTest {
         } catch (WrinkleFeaturesException e) {
             e.printStackTrace();
         }
+        assert wrinkleFeature != null;
         wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
         System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
         pause();
@@ -98,6 +101,7 @@ public class WrinkleFeatureTest {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeature.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);

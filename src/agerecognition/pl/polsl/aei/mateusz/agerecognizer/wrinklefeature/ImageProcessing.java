@@ -39,7 +39,7 @@ public class ImageProcessing {
 
     /**
      * @param source
-     * @return image with detected edges
+     * @return image with detected edges. Edges = wrinkles
      */
     protected static Mat detectEdges(Mat source) {
         Mat destination = source.clone();

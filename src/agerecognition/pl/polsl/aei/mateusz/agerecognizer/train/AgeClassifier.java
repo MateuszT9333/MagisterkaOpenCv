@@ -46,19 +46,19 @@ public class AgeClassifier {
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();
-                log.println(wrinkleFeatureExceptionMessage);
+                log.println(wrinkleFeatureExceptionMessage); //TODO log4j
                 // System.err.println(wrinkleFeatureExceptionMessage);
                 continue;
             } catch (Error e) {
                 invalidProcessedImages++;
                 String errorMessage = "Error: Path: " + image.getName();
-                log.println(errorMessage);
+                log.println(errorMessage);//TODO log4j
                 //System.err.println(errorMessage);
                 continue;
             } catch (Exception e) {
                 invalidProcessedImages++;
                 String exceptionMessage = "Exception: Path: " + image.getName();
-                log.println(exceptionMessage);
+                log.println(exceptionMessage);//TODO log4j
                 //System.err.println(exceptionMessage);
                 continue;
             }
@@ -66,14 +66,14 @@ public class AgeClassifier {
             validProcessedImages++;
             float wrinkleFeatureResult = wrinkleFeature.getWrinkleFeatures();
             byte age = getAgeFromPath(image.getName());
-            objectToJSON(new AgeToWrinkleFeature(age, wrinkleFeatureResult), ageToWrinkleJson);
+            objectToJSON(new AgeToWrinkleFeature(age, wrinkleFeatureResult), ageToWrinkleJson); //TODO Metoda Wytworcza - tworzenie stringa na podstawie danych. String pozniej jest wpierdalany do pliku
 
             String succesfullProcessedMessage =
                     String.format("Success!: Path: %s: (age: %d | feature: %f)"
                             , image.getName()
                             , age
                             , wrinkleFeatureResult);
-            log.println(succesfullProcessedMessage);
+            log.println(succesfullProcessedMessage);//TODO log4j
             System.out.println(succesfullProcessedMessage);
         }
 
@@ -92,13 +92,13 @@ public class AgeClassifier {
         System.out.println(processedImages);
         System.out.println(exexutionTime);
 
-        log.println(correctlyProcessedImages);
+        log.println(correctlyProcessedImages);//TODO log4j
         log.println(incorrectlyProcessedImages);
         log.println(processedImages);
         log.println(exexutionTime);
     }
 
-    private static void initializeOutputFilesWriters(String trainingSetPrefix, String subPathOfImages) {
+    private static void initializeOutputFilesWriters(String trainingSetPrefix, String subPathOfImages) {//TODO log4j
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String suffixOfFile = trainingSetPrefix + "_" + timeStamp + "_" + subPathOfImages + ".txt";
 

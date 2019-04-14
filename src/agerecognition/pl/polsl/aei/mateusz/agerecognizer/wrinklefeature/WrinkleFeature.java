@@ -28,35 +28,39 @@ public class WrinkleFeature {
 
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
-    private final File path;
-    private final Mat processedMat;
+    private File path;
+    private Mat processedMat;
     private float wrinkleFeatures;
-    private Mat grayProcessedMat;
+    private Mat grayProcessedMat = null;
     private Mat croppedToFace;
     private Mat detectedNoseAndEyes;
     private Mat detectedEdges;
 
-
     /**
-     * Constructor detecting face in image and calculating wrinkle featurer
+     * Detecting face in image and calculating wrinkle featurer
      *
      * @param path            path to processed file
-     * @param isCroppedToFace If cropped to face. Especially for training database files
+     * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
      */
     public WrinkleFeature(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
 
         this.path = path;
-        this.processedMat = Imgcodecs.imread(path.getAbsolutePath());
+        processedMat = Imgcodecs.imread(path.getAbsolutePath());
 
-        if (isCroppedToFace) {
-            this.croppedToFace = this.processedMat;
-            detectPairOfEyesAndNose();
-            calculateWrinkleFeatures();
-            return;
-        }
-        faceDetector();
-        cropToFace();
-        detectPairOfEyesAndNose();
+//        if (isCroppedToFace) {
+//            croppedToFace = processedMat;
+//            new WrinkleFeature();
+//            return;
+//        }
+        grayProcessedMat = faceDetector(processedMat);
+        croppedToFace = cropToFace(grayProcessedMat);
+        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
+        calculateWrinkleFeatures();
+
+    }
+
+    private WrinkleFeature() throws WrinkleFeaturesException {
+        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
         calculateWrinkleFeatures();
 
     }
@@ -82,6 +86,10 @@ public class WrinkleFeature {
         eyeballsCenter.add(tempSecondEye);
 
         return eyeballsCenter;
+    }
+
+    public Mat getGrayProcessedMat() {
+        return grayProcessedMat;
     }
 
     public Mat getCroppedToFace() {
@@ -114,17 +122,19 @@ public class WrinkleFeature {
 
     /**
      * Adding faces rectangles to detectedObjectMap, initializes this.grayProcessedMat field (makes gray oryginal image)
+     * @return
      */
-    private void faceDetector() throws WrinkleFeaturesException {
+    private Mat faceDetector(Mat image) throws WrinkleFeaturesException {
 
-        this.grayProcessedMat = this.processedMat.clone();
+        grayProcessedMat = image;
         if (processedMat.channels() != 1) {
-            ImageProcessing.makeGrayImage(this.grayProcessedMat);
+            ImageProcessing.makeGrayImage(grayProcessedMat);
         }
         //Drawing a black rectangle to crop a face
         addDetectedObjects(new PropertiesLoader().getProperty("frontalFaceDetectorPath")
-                , this.grayProcessedMat
+                , grayProcessedMat
                 , FACES);
+        return grayProcessedMat;
 
     }
 
@@ -141,37 +151,38 @@ public class WrinkleFeature {
      * Initialiaze this.croppedToFace field
      *
      * @throws WrinkleFeaturesException when no face is detected
+     * @return
      */
-    private void cropToFace() throws WrinkleFeaturesException {
+    private Mat cropToFace(Mat grayImage) throws WrinkleFeaturesException {
         int detectedFaces = detectedObjects.get(FACES).size();
 
         if (detectedFaces > 1) {
-            throw new WrinkleFeaturesException(this.path.getName() + ": To much faces for training.");
+            throw new WrinkleFeaturesException(this.path.getName() + ": To much faces detected.");
         } else {
             Rect detectedFace = detectedObjects.get(FACES).get(0);
-            this.croppedToFace = ImageProcessing.generateCroppedMat(this.grayProcessedMat, detectedFace);
+            return ImageProcessing.generateCroppedMat(grayImage, detectedFace);
         }
     }
 
     /**
      * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
+     * @return
      */
-    private void detectPairOfEyesAndNose() throws WrinkleFeaturesException {
-        Mat temp = this.croppedToFace.clone();
+    private Mat detectPairOfEyesAndNose(Mat image) throws WrinkleFeaturesException {
         //Detect eyes pair
-        detectEyesPair(temp);
+        detectEyesPair(image);
         //Detect nose
-        detectNose(temp);
+        detectNose(image);
         //Detect eyes, calculate center of eyes and distance between them
-        detectEyes(temp);
+        detectEyes(image);
 
         //Detect mouth
 //        tempCroppedImage = addDetectedObjects(mouthDetectorPath, tempCroppedImage, null,
 //                false);
-        Rect centerOfEyeOne = this.detectedObjects
+        Rect centerOfEyeOne = detectedObjects
                 .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
 
-        Rect centerOfEyeTwo = this.detectedObjects
+        Rect centerOfEyeTwo = detectedObjects
                 .get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
 
         centerOfEyeOne.width += 10;
@@ -180,7 +191,7 @@ public class WrinkleFeature {
         centerOfEyeTwo.width += 10;
         centerOfEyeTwo.height += 10;
 
-        this.detectedNoseAndEyes = ImageProcessing.drawARectanglesInMat(temp
+        return ImageProcessing.drawARectanglesInMat(image
                 , detectedObjects.get(EYE_PAIR).get(0)
                 , detectedObjects.get(NOSE).get(0)
                 , centerOfEyeOne
@@ -201,7 +212,7 @@ public class WrinkleFeature {
         Rect leftEyeCornerArea = getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
 
-        this.detectedEdges = ImageProcessing.detectEdges(this.croppedToFace.clone());
+        detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
 
         wrinkleAreas.add(foreheadArea);
         wrinkleAreas.add(leftCheekArea);
@@ -216,7 +227,7 @@ public class WrinkleFeature {
             whitePixelsInWrinkleAreas += calculateWhitePixels(wrinkleArea);
             areaOfAllWrinkleAreas += calculateArea(wrinkleArea);
         }
-        this.wrinkleFeatures = (float) whitePixelsInWrinkleAreas / areaOfAllWrinkleAreas;
+        wrinkleFeatures = (float) whitePixelsInWrinkleAreas / areaOfAllWrinkleAreas;
     }
 
     private int calculateArea(Rect wrinkleArea) {
@@ -300,14 +311,14 @@ public class WrinkleFeature {
 
 
     public void showWrinkleAreas(Scalar scalar) {
-        Mat temp = this.detectedEdges.clone();
+        Mat temp = detectedEdges.clone();
         ImageProcessing.drawARectangleInMat(temp, scalar, wrinkleAreas);
         Imshow.show(temp, "Wrinkle areas", WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
     private float calculateWhitePixels(Rect wrinkleArea) {
         Mat croppedWrinkleArea = new Mat();
-        Mat croppedMat = ImageProcessing.generateCroppedMat(this.detectedEdges, wrinkleArea);
+        Mat croppedMat = ImageProcessing.generateCroppedMat(detectedEdges, wrinkleArea);
         Core.extractChannel(croppedMat, croppedWrinkleArea, 0);
         return Core.countNonZero(croppedWrinkleArea);
     }
