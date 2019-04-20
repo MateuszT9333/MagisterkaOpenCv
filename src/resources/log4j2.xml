@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="mainC" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
+        </Console>
+        <RollingFile
+                name="mainF"
+                immediateFlush="false"
+                fileName="log/app.log"
+                filePattern="log/app.%d{YYYYMMdd_HHmm}_%i.log"
+                ignoreExceptions="false">
+            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy max="99"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="error">
+            <AppenderRef ref="mainC"/>
+            <AppenderRef ref="mainF"/>
+        </Root>
+        <Logger name="main" additivity="false" level="trace">
+            <AppenderRef ref="mainC"/>
+            <AppenderRef ref="mainF"/>
+        </Logger>
+    </Loggers>
+</Configuration>

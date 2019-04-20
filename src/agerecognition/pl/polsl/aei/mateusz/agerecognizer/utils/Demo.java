@@ -1,5 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -44,10 +46,15 @@ class DetectFaceDemo {
 }
 
 public class Demo {
-    public static void main(String[] args) {
-        System.out.println("Hello, OpenCV");
+    static final Logger log = LogManager.getLogger("main");
+
+    public static void main(String[] args) throws InterruptedException {
+
         // Load the native library.
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        new DetectFaceDemo().run();
+        while (true) {
+            log.trace("It works");
+        }
+//        new DetectFaceDemo().run();
     }
 }
