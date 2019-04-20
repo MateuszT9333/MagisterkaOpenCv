@@ -1,5 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
@@ -8,6 +10,8 @@ import javax.swing.*;
 import java.util.List;
 
 public class ImageProcessing {
+    static final Logger log = LogManager.getLogger("main");
+
     public ImageProcessing() {
     }
 
@@ -79,7 +83,8 @@ public class ImageProcessing {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.catching(e);
+            ;
         }
     }
 }

@@ -1,5 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
@@ -20,10 +22,12 @@ import static pl.polsl.aei.mateusz.agerecognizer.utils.DetectedObjectsEnum.*;
  * Class for detecting wrinkle features in face image.
  */
 public class WrinkleFeature {
+    static final Logger log = LogManager.getLogger("main");
+
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        System.out.println("OpenCv Core loaded");
+        log.info("OpenCv Core loaded");
     }
 
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
@@ -326,7 +330,7 @@ public class WrinkleFeature {
     private Rect getRectOfForeheadArea(Rect centerOfFirstEye, Rect centerOfSecondEye) {
 
         Point rightEyeCenter;
-        int distanseBetweenEyes = DistanceCalculator.getDistance(centerOfFirstEye, centerOfSecondEye);
+        int distanseBetweenEyes = DistanceCalculator.getDistanceFromRect(centerOfFirstEye, centerOfSecondEye);
 
         if (centerOfFirstEye.x < centerOfSecondEye.x) {
             rightEyeCenter = new Point(centerOfFirstEye.x, centerOfFirstEye.y);

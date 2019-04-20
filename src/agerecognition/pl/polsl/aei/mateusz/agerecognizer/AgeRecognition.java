@@ -1,5 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.train.AgeClassifier;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
@@ -12,6 +14,7 @@ import java.io.File;
  */
 public class AgeRecognition {
     private final static String imagePath = new PropertiesLoader().getProperty("ageToRecognizePath");
+    static final Logger log = LogManager.getLogger("main");
 
     public static void main(String[] args) {
         recognizeAge();
@@ -26,11 +29,11 @@ public class AgeRecognition {
             try {
                 wrinkleFeature = new WrinkleFeature(image, false);
             } catch (WrinkleFeaturesException e) {
-                e.printStackTrace();
+                log.catching(e);
             }
             assert wrinkleFeature != null;
             int detectedAge = AgeClassifier.detectAgeFromWrinkleFeature(wrinkleFeature.getWrinkleFeatures());
-            System.out.println(String.format("Detected age for image %s: %d", image, detectedAge));
+            log.info(String.format("Detected age for image %s: %d", image, detectedAge));
         }
     }
 

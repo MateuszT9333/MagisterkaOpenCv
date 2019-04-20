@@ -7,7 +7,6 @@ public class WrinkleFeaturesException extends Exception {
     public WrinkleFeaturesException(String message) {
         message = "WrinkleFeatureException: " + message;
         this.message = message;
-        System.err.println(message);
     }
 
     @Override

@@ -1,11 +1,12 @@
-package pl.polsl.aei.mateusz.agerecognizer.train;
+package pl.polsl.aei.mateusz.agerecognizer;
 
 import org.junit.Test;
+import pl.polsl.aei.mateusz.agerecognizer.train.AgeClassifier;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
 
-public class AgeClassifierTest {
+public class Train {
     @Test
     public void generateDataFromImagesManual() {
         AgeClassifier.generateDataFromImages("1", "41");

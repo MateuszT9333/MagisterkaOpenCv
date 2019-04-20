@@ -14,11 +14,13 @@ import javax.swing.*;
 // to "faceDetection.png".
 //
 class DetectFaceDemo {
+    static final Logger log = LogManager.getLogger("main");
+
     final String resourcesPath = "src/resources";
     final String savedImages = "savedImages";
 
     public void run() {
-        System.out.println("\nRunning DetectFaceDemo");
+        log.info("\nRunning DetectFaceDemo");
 
         // Create a face detector from the cascade file in the resources
         // directory.
@@ -31,16 +33,16 @@ class DetectFaceDemo {
         MatOfRect faceDetections = new MatOfRect();
         faceDetector.detectMultiScale(image, faceDetections);
 
-        System.out.println(String.format("Detected %s faces", faceDetections.toArray().length));
+        log.info(String.format("Detected %s faces", faceDetections.toArray().length));
 
         // Draw a bounding box around each face.
         for (Rect rect : faceDetections.toArray()) {
             Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
         }
-        Imshow.show(image, "Cudowna Lena", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(image, "Lena", WindowConstants.DO_NOTHING_ON_CLOSE);
         // Save the visualized detection.
         String filename = savedImages + "/faceDetection.png";
-        System.out.println(String.format("Writing %s", filename));
+        log.info(String.format("Writing %s", filename));
         Imgcodecs.imwrite(filename, image);
     }
 }

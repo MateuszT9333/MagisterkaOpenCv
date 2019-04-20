@@ -11,6 +11,8 @@
  */
 package pl.polsl.aei.mateusz.agerecognizer.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -22,6 +24,7 @@ import java.awt.image.DataBufferByte;
 
 
 public class Imshow {
+    static final Logger log = LogManager.getLogger("main");
 
     public JFrame Window;
     private ImageIcon image;
@@ -69,7 +72,7 @@ public class Imshow {
             label.updateUI();
             Window.setVisible(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.catching(e);
         }
     }
 

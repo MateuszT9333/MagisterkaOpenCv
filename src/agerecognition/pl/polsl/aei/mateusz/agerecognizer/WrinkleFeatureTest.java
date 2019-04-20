@@ -1,5 +1,7 @@
-package pl.polsl.aei.mateusz.agerecognizer.test;
+package pl.polsl.aei.mateusz.agerecognizer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -22,6 +24,7 @@ public class WrinkleFeatureTest {
 
     private final static File mojaTwarz = new File(new PropertiesLoader().getProperty("mojaTwarz"));
     private File processedImage = mojaTwarz;
+    static final Logger log = LogManager.getLogger("main");
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -33,7 +36,7 @@ public class WrinkleFeatureTest {
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
-            e.printStackTrace();
+            log.catching(e);
         }
         assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -53,7 +56,7 @@ public class WrinkleFeatureTest {
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
-            e.printStackTrace();
+            log.catching(e);
         }
         assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -66,7 +69,7 @@ public class WrinkleFeatureTest {
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
-            e.printStackTrace();
+            log.catching(e);
         }
         assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -84,11 +87,11 @@ public class WrinkleFeatureTest {
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (WrinkleFeaturesException e) {
-            e.printStackTrace();
+            log.catching(e);
         }
         assert wrinkleFeature != null;
         wrinkleFeature.showWrinkleAreas(new Scalar(0, 0, 0));
-        System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
+        log.info("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
         pause();
     }
 
@@ -99,7 +102,7 @@ public class WrinkleFeatureTest {
         try {
             wrinkleFeature = new WrinkleFeature(processedImage, false);
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.catching(e);
         }
         assert wrinkleFeature != null;
         Imshow.show(wrinkleFeature.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -108,9 +111,9 @@ public class WrinkleFeatureTest {
         Imshow.show(wrinkleFeature.getDetectedEdges(), "Detected edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         wrinkleFeature.showWrinkleAreas(new Scalar(255, 0, 0));
 
-        System.out.println("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
-        System.out.println("Detected objects " + wrinkleFeature.getDetectedObjects());
-        System.out.println("Calculated wrinkle areas " + wrinkleFeature.getWrinkleAreas());
+        log.info("Wrinkle features " + wrinkleFeature.getWrinkleFeatures());
+        log.info("Detected objects " + wrinkleFeature.getDetectedObjects());
+        log.info("Calculated wrinkle areas " + wrinkleFeature.getWrinkleAreas());
         pause();
     }
 
@@ -119,4 +122,9 @@ public class WrinkleFeatureTest {
 //        File file = processedImage;
 //        assertTrue(file.length() > 0);
 //    }
+
+    @Test
+    public void name() {
+
+    }
 }
