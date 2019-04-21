@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.utils.AgeToWrinkleFeature;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.utils.files.FileFactory;
+import pl.polsl.aei.mateusz.agerecognizer.utils.files.FileProduct;
+import pl.polsl.aei.mateusz.agerecognizer.utils.files.FileType;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
 import java.io.*;
@@ -93,11 +96,14 @@ public class AgeClassifier {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String suffixOfFile = trainingSetPrefix + "_" + timeStamp + "_" + subPathOfImages + ".txt";
 
-        try {
-            ageToWrinkleJson2 = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
-        } catch (FileNotFoundException e) {
-            log.catching(e);
-        }
+        FileProduct fileProduct = FileFactory.create(FileType.ageToWrinkleJson2);
+        fileProduct.createFileWithSuffix(suffixOfFile);
+//        fileProduct.writeln();
+//        try {
+//            ageToWrinkleJson2 = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
+//        } catch (FileNotFoundException e) {
+//            log.catching(e);
+//        }
     }
 
     private static void clusterDataByFuzzyKMeans(List<AgeToWrinkleFeature> ageToWrinkleFeatureList) {
