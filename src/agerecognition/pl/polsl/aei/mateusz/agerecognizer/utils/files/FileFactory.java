@@ -4,7 +4,7 @@ public class FileFactory {
 
     public static FileProduct create(FileType type) {
         switch (type) {
-            case ageToWrinkleJson2:
+            case ageToWrinkleJson:
                 return new AgeToWrinkleJsonFile();
             case clusteredJson:
                 return new ClusteredJsonFile();

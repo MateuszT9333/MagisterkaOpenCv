@@ -11,7 +11,8 @@ import java.io.PrintStream;
 public abstract class FileProduct {
 
     private static final Logger log = LogManager.getLogger("main");
-    private PrintStream printStream;
+    PrintStream printStream;
+    protected File file;
 
     public abstract void createFileWithSuffix(String suffixOfFile);
 
@@ -25,4 +26,10 @@ public abstract class FileProduct {
             this.printStream = null;
         }
     }
+
+    final PrintStream getPrintStream() {
+        return this.printStream;
+    }
+
+    public abstract int nextIntegerCounter();
 }

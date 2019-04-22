@@ -21,27 +21,31 @@ import java.util.List;
 
 public class AgeClassifier {
 
-    private static PrintStream ageToWrinkleJson2;
     private static PrintStream clusteredJson;
     private static PrintStream mergedJson;
     private static PrintStream matlabDat;
     private static final Logger log = LogManager.getLogger("main");
     private static int invalidProcessedImages = 0;
     private static int validProcessedImages = 0;
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
     public static void generateDataFromImages(String trainingSetPrefix, String subPathOfImages) {
-
         long startTime = System.currentTimeMillis();
 
-        File file = new File(new PropertiesLoader().getProperty("trainingImagesPath") + subPathOfImages);
-        File[] images = file.listFiles(pathname -> pathname.getName().contains(".")); //only files
-        if (images.length == 0) {
+        File files = new File(propertiesLoader.getProperty("trainingImagesPath") + subPathOfImages);
+        File[] imagesInDir = files.listFiles(pathname -> pathname.getName().contains(".")); //only files
+        if (imagesInDir.length == 0) {
             log.error("No files in this subfolder!");
         }
 
-        initializeOutputFilesWriters(trainingSetPrefix, subPathOfImages);
+//        initializeOutputFilesWriters(trainingSetPrefix, subPathOfImages);
+        //create file for results
+        FileProduct ageToWrinkleJson = FileFactory.create(FileType.ageToWrinkleJson);
+        int integerCounter = ageToWrinkleJson.nextIntegerCounter(); //next integer counter in suffix in file name
+        String suffixOfFile = String.format("%s_%d", trainingSetPrefix, integerCounter);
+        ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
 
-        for (File image : images) {
+        for (File image : imagesInDir) {
             WrinkleFeature wrinkleFeature = null;
 
             try {
@@ -66,7 +70,7 @@ public class AgeClassifier {
             validProcessedImages++;
             float wrinkleFeatureResult = wrinkleFeature.getWrinkleFeatures();
             byte age = getAgeFromPath(image.getName());
-            ageToWrinkleJson2.println(objectToJSON(new AgeToWrinkleFeature(age, wrinkleFeatureResult))); //TODO Metoda Wytworcza - tworzenie stringa na podstawie danych. String pozniej jest wpierdalany do pliku
+//            ageToWrinkleJson2.println(objectToJSON(new AgeToWrinkleFeature(age, wrinkleFeatureResult))); //TODO Metoda Wytworcza - tworzenie stringa na podstawie danych. String pozniej jest wpierdalany do pliku
 
             String succesfullProcessedMessage =
                     String.format("Success!: Path: %s: (age: %d | feature: %f)"
@@ -77,7 +81,7 @@ public class AgeClassifier {
         }
 
         generateStats(startTime, invalidProcessedImages, validProcessedImages);
-        //objectToJSON(ageToWrinkleFeatureList, ageToWrinkleJson2);
+        //objectToJSON(ageToWrinkleFeatureList, ageToWrinkleJson);
     }
 
     private static void generateStats(long startTime, int invalidProcessedImages, int validProcessedImages) {
@@ -96,11 +100,11 @@ public class AgeClassifier {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String suffixOfFile = trainingSetPrefix + "_" + timeStamp + "_" + subPathOfImages + ".txt";
 
-        FileProduct fileProduct = FileFactory.create(FileType.ageToWrinkleJson2);
+        FileProduct fileProduct = FileFactory.create(FileType.ageToWrinkleJson);
         fileProduct.createFileWithSuffix(suffixOfFile);
 //        fileProduct.writeln();
 //        try {
-//            ageToWrinkleJson2 = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
+//            ageToWrinkleJson = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
 //        } catch (FileNotFoundException e) {
 //            log.catching(e);
 //        }
@@ -165,7 +169,7 @@ public class AgeClassifier {
 
         try {
             clusteredJson = new PrintStream(new FileOutputStream(
-                    new File(new PropertiesLoader().getProperty("clusteredJsonPath") + timeStamp + ".txt")));
+                    new File(propertiesLoader.getProperty("clusteredJsonData") + timeStamp + ".txt")));
         } catch (FileNotFoundException e) {
             log.catching(e);
         }
@@ -188,14 +192,14 @@ public class AgeClassifier {
     public static void mergeAgeToWrinkleFeaturesFromJsons(String trainingSetPath) {
         try {
             mergedJson = new PrintStream(new FileOutputStream(
-                    new File(new PropertiesLoader().getProperty("mergedAgeToWrinkleFeaturesPath") + trainingSetPath + ".txt")));
+                    new File(propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData") + trainingSetPath + ".txt")));
             matlabDat = new PrintStream(new FileOutputStream(
-                    new File(new PropertiesLoader().getProperty("mergedAgeToWrinkleFeaturesPath") + trainingSetPath + ".dat")));
+                    new File(propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData") + trainingSetPath + ".dat")));
 
         } catch (FileNotFoundException e) {
             log.catching(e);
         }
-        File file = new File(new PropertiesLoader().getProperty("pathToDump"));
+        File file = new File(propertiesLoader.getProperty("pathToData"));
 
         File[] listOfFiles = file.listFiles(pathname -> pathname.getName()
                 .contains("ageToWrinkleFeaturesJson" + trainingSetPath));
