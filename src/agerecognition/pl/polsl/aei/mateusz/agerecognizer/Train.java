@@ -7,6 +7,8 @@ import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import java.io.File;
 
 public class Train {
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+
     @Test
     public void generateDataFromImagesManual() {
         AgeClassifier.generateDataFromImages("1", "41");
@@ -15,7 +17,7 @@ public class Train {
     @Test
     public void generateDataFromImagesAuto() throws InterruptedException {
         boolean process = false;
-        File images = new File(new PropertiesLoader().getProperty("trainingImagesPath"));
+        File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
         String startFrom = "19";
         for (File image : images.listFiles()) {
 

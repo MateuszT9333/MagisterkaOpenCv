@@ -21,8 +21,9 @@ import java.util.Scanner;
  * Some tests...
  */
 public class WrinkleFeatureTest {
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
-    private final static File mojaTwarz = new File(new PropertiesLoader().getProperty("mojaTwarz"));
+    private final static File mojaTwarz = new File(propertiesLoader.getProperty("mojaTwarz"));
     private File processedImage = mojaTwarz;
     static final Logger log = LogManager.getLogger("main");
 

@@ -30,6 +30,8 @@ public class WrinkleFeature {
         log.info("OpenCv Core loaded");
     }
 
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
     private File path;
@@ -135,7 +137,7 @@ public class WrinkleFeature {
             ImageProcessing.makeGrayImage(grayProcessedMat);
         }
         //Drawing a black rectangle to crop a face
-        addDetectedObjects(new PropertiesLoader().getProperty("frontalFaceDetectorPath")
+        addDetectedObjects(propertiesLoader.getProperty("frontalFaceDetectorPath")
                 , grayProcessedMat
                 , FACES);
         return grayProcessedMat;
@@ -144,7 +146,7 @@ public class WrinkleFeature {
 
 
     private void makeMatsAndSomeFieldsNotNull() {
-        String nullJpg = new PropertiesLoader().getProperty("nullJpg");
+        String nullJpg = propertiesLoader.getProperty("nullJpg");
         this.grayProcessedMat = Imgcodecs.imread(nullJpg);
         this.croppedToFace = Imgcodecs.imread(nullJpg);
         this.detectedEdges = Imgcodecs.imread(nullJpg);
@@ -239,7 +241,7 @@ public class WrinkleFeature {
     }
 
     private void detectEyes(Mat croppedImage) throws WrinkleFeaturesException {
-        addDetectedObjects(new PropertiesLoader().getProperty("eyesDetectorPath"), croppedImage
+        addDetectedObjects(propertiesLoader.getProperty("eyesDetectorPath"), croppedImage
                 , DetectedObjectsEnum.EYES);
 
         List<Rect> listOfEyesRectangles = detectedObjects.get(DetectedObjectsEnum.EYES);
@@ -253,14 +255,14 @@ public class WrinkleFeature {
     }
 
     private void detectEyesPair(Mat croppedImage) throws WrinkleFeaturesException {
-        addDetectedObjects(new PropertiesLoader().getProperty("eyePairDetectorPath"), croppedImage
+        addDetectedObjects(propertiesLoader.getProperty("eyePairDetectorPath"), croppedImage
                 , DetectedObjectsEnum.EYE_PAIR);
 
     }
 
 
     private void detectNose(Mat croppedImage) throws WrinkleFeaturesException {
-        addDetectedObjects(new PropertiesLoader().getProperty("noseDetectorPath"), croppedImage
+        addDetectedObjects(propertiesLoader.getProperty("noseDetectorPath"), croppedImage
                 , DetectedObjectsEnum.NOSE);
 
     }

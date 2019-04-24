@@ -13,7 +13,9 @@ import java.io.File;
  * Recognizing Age from selected image
  */
 public class AgeRecognition {
-    private final static String imagePath = new PropertiesLoader().getProperty("ageToRecognizePath");
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+
+    private final static String imagePath = propertiesLoader.getProperty("ageToRecognizePath");
     static final Logger log = LogManager.getLogger("main");
 
     public static void main(String[] args) {

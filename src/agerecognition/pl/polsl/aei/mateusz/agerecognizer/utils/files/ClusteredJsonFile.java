@@ -11,4 +11,9 @@ public class ClusteredJsonFile extends FileProduct {
     public void writeln(Object object) {
 
     }
+
+    @Override
+    public int nextIntegerCounter() {
+        return 0;
+    }
 }
