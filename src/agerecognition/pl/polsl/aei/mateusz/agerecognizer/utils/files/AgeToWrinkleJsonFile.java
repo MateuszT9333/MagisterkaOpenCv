@@ -1,5 +1,6 @@
 package pl.polsl.aei.mateusz.agerecognizer.utils.files;
 
+import com.google.gson.Gson;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
@@ -22,11 +23,10 @@ public class AgeToWrinkleJsonFile extends FileProduct {
     }
 
     @Override
-    public void writeln(Object object) {
-        String line = object.toString();//line to write in printstream //TODO
+    public void writeln(Object ageToWrinkleFeature) {
+        String line = new Gson().toJson(ageToWrinkleFeature);
         printStream.println(line);
     }
-
     @Override
     public int nextIntegerCounter() {
         //iterate over file in dir

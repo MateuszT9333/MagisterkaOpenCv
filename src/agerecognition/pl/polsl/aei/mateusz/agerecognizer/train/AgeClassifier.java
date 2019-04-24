@@ -21,13 +21,13 @@ import java.util.List;
 
 public class AgeClassifier {
 
+    private static final Logger log = LogManager.getLogger("main");
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static PrintStream clusteredJson;
     private static PrintStream mergedJson;
     private static PrintStream matlabDat;
-    private static final Logger log = LogManager.getLogger("main");
     private static int invalidProcessedImages = 0;
     private static int validProcessedImages = 0;
-    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
     public static void generateDataFromImages(String trainingSetPrefix, String subPathOfImages) {
         long startTime = System.currentTimeMillis();
@@ -46,7 +46,7 @@ public class AgeClassifier {
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
 
         for (File image : imagesInDir) {
-            WrinkleFeature wrinkleFeature = null;
+            WrinkleFeature wrinkleFeature;
 
             try {
                 wrinkleFeature = new WrinkleFeature(image, false);
@@ -58,56 +58,32 @@ public class AgeClassifier {
             } catch (Error e) {
                 invalidProcessedImages++;
                 String errorMessage = "Error: Path: " + image.getName();
-                log.error(errorMessage);//TODO zmienic wyswietlana wiadomosc
+                log.error(errorMessage);
                 continue;
             } catch (Exception e) {
                 invalidProcessedImages++;
                 String exceptionMessage = "Exception: Path: " + image.getName();
-                log.error(exceptionMessage);//TODO zmienic wyswietlana wiadomosc
+                log.error(exceptionMessage);
                 continue;
             }
             //Succesfully processed wrinkle feature
             validProcessedImages++;
             float wrinkleFeatureResult = wrinkleFeature.getWrinkleFeatures();
             byte age = getAgeFromPath(image.getName());
-//            ageToWrinkleJson2.println(objectToJSON(new AgeToWrinkleFeature(age, wrinkleFeatureResult))); //TODO Metoda Wytworcza - tworzenie stringa na podstawie danych. String pozniej jest wpierdalany do pliku
+            ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult)); //write result to file
 
-            String succesfullProcessedMessage =
-                    String.format("Success!: Path: %s: (age: %d | feature: %f)"
-                            , image.getName()
-                            , age
-                            , wrinkleFeatureResult);
-            log.info(succesfullProcessedMessage);
+            log.info(String.format("Success!: Path: %s: (age: %d | feature: %f)", image.getName(), age, wrinkleFeatureResult));
         }
-
-        generateStats(startTime, invalidProcessedImages, validProcessedImages);
-        //objectToJSON(ageToWrinkleFeatureList, ageToWrinkleJson);
+        generateStats(startTime);
     }
 
-    private static void generateStats(long startTime, int invalidProcessedImages, int validProcessedImages) {
+    private static void generateStats(long startTime) {
         String correctlyProcessedImages = "\n\nCorrectly processed images: " + validProcessedImages;
         String incorrectlyProcessedImages = "Incorrectly processed images: " + invalidProcessedImages;
         String processedImages = "Sum of processed images: " + (invalidProcessedImages + validProcessedImages);
         String exexutionTime = "Execution time: " + ((float) (System.currentTimeMillis() - startTime) / 1000) + " s";
 
-        log.info(correctlyProcessedImages);
-        log.info(incorrectlyProcessedImages);
-        log.info(processedImages);
-        log.info(exexutionTime);
-    }
-
-    private static void initializeOutputFilesWriters(String trainingSetPrefix, String subPathOfImages) {//TODO log4j
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String suffixOfFile = trainingSetPrefix + "_" + timeStamp + "_" + subPathOfImages + ".txt";
-
-        FileProduct fileProduct = FileFactory.create(FileType.ageToWrinkleJson);
-        fileProduct.createFileWithSuffix(suffixOfFile);
-//        fileProduct.writeln();
-//        try {
-//            ageToWrinkleJson = new PrintStream(new FileOutputStream(new File(new PropertiesLoader().getProperty("ageToWrinkleJsonPath") + suffixOfFile)));
-//        } catch (FileNotFoundException e) {
-//            log.catching(e);
-//        }
+        log.info("%s\n%s\n%s\n%s", correctlyProcessedImages, incorrectlyProcessedImages, processedImages, exexutionTime);
     }
 
     private static void clusterDataByFuzzyKMeans(List<AgeToWrinkleFeature> ageToWrinkleFeatureList) {
@@ -168,7 +144,7 @@ public class AgeClassifier {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
         try {
-            clusteredJson = new PrintStream(new FileOutputStream(
+            clusteredJson = new PrintStream(new FileOutputStream( //TODO fileproduct
                     new File(propertiesLoader.getProperty("clusteredJsonData") + timeStamp + ".txt")));
         } catch (FileNotFoundException e) {
             log.catching(e);
@@ -191,7 +167,7 @@ public class AgeClassifier {
 
     public static void mergeAgeToWrinkleFeaturesFromJsons(String trainingSetPath) {
         try {
-            mergedJson = new PrintStream(new FileOutputStream(
+            mergedJson = new PrintStream(new FileOutputStream( //TODO fileproduct
                     new File(propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData") + trainingSetPath + ".txt")));
             matlabDat = new PrintStream(new FileOutputStream(
                     new File(propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData") + trainingSetPath + ".dat")));

@@ -23,14 +23,12 @@ import static pl.polsl.aei.mateusz.agerecognizer.utils.DetectedObjectsEnum.*;
  */
 public class WrinkleFeature {
     static final Logger log = LogManager.getLogger("main");
-
+    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         log.info("OpenCv Core loaded");
     }
-
-    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
@@ -128,6 +126,7 @@ public class WrinkleFeature {
 
     /**
      * Adding faces rectangles to detectedObjectMap, initializes this.grayProcessedMat field (makes gray oryginal image)
+     *
      * @return
      */
     private Mat faceDetector(Mat image) throws WrinkleFeaturesException {
@@ -156,8 +155,8 @@ public class WrinkleFeature {
     /**
      * Initialiaze this.croppedToFace field
      *
-     * @throws WrinkleFeaturesException when no face is detected
      * @return
+     * @throws WrinkleFeaturesException when no face is detected
      */
     private Mat cropToFace(Mat grayImage) throws WrinkleFeaturesException {
         int detectedFaces = detectedObjects.get(FACES).size();
@@ -172,6 +171,7 @@ public class WrinkleFeature {
 
     /**
      * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
+     *
      * @return
      */
     private Mat detectPairOfEyesAndNose(Mat image) throws WrinkleFeaturesException {
