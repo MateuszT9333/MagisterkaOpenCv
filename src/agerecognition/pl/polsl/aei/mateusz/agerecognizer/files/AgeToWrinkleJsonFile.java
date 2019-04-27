@@ -1,7 +1,6 @@
-package pl.polsl.aei.mateusz.agerecognizer.utils.files;
+package pl.polsl.aei.mateusz.agerecognizer.files;
 
 import com.google.gson.Gson;
-import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
 import java.util.Arrays;
@@ -12,23 +11,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class AgeToWrinkleJsonFile extends FileProduct {
-    private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
-    private String dir = propertiesLoader.getProperty("pathToData");
-    private String filename = propertiesLoader.getProperty("ageToWrinkleJsonData");
+    private static String dir = propertiesLoader.getProperty("pathToData");
+    private static String filename = propertiesLoader.getProperty("ageToWrinkleJsonData");
 
-    @Override
-    public void createFileWithSuffix(String suffixOfFile) {
-        this.file = new File(String.format("%s%s%s.txt", dir, filename, suffixOfFile));
-        setPrintStream(file);
-    }
-
-    @Override
-    public void writeln(Object ageToWrinkleFeature) {
-        String line = new Gson().toJson(ageToWrinkleFeature);
-        printStream.println(line);
-    }
-    @Override
-    public int nextIntegerCounter() {
+    public static int nextIntegerCounter() {
         //iterate over file in dir
         File dataDir = new File(dir);
         File[] filesLikeAgeToWrinkleJson = dataDir.listFiles(pathname -> pathname.getName()
@@ -44,12 +30,24 @@ public class AgeToWrinkleJsonFile extends FileProduct {
         } else return 0;
     }
 
-    private int extractSuffix(String name) {
+    private static int extractSuffix(String name) {
         Pattern pattern = Pattern.compile("_[0-9]*");
         Matcher matcher = pattern.matcher(name);
         if (matcher.find()) {
             return Integer.parseInt(matcher.group(0).replace("_", ""));
         }
         return -1;
+    }
+
+    @Override
+    public void createFileWithSuffix(String suffixOfFile) {
+        this.file = new File(String.format("%s%s%s.txt", dir, filename, suffixOfFile));
+        setPrintStream(file);
+    }
+
+    @Override
+    public void writeln(Object ageToWrinkleFeature) {
+        String line = new Gson().toJson(ageToWrinkleFeature);
+        printStream.println(line);
     }
 }
