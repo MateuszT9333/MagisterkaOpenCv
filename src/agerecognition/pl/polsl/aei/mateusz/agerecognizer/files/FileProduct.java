@@ -12,7 +12,7 @@ import java.io.PrintStream;
 public abstract class FileProduct {
     final static PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static final Logger log = LogManager.getLogger("main");
-    protected File file;
+    File file;
     PrintStream printStream;
 
     public abstract void createFileWithSuffix(String suffixOfFile);

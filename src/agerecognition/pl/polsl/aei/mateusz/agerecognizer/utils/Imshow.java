@@ -24,12 +24,12 @@ import java.awt.image.DataBufferByte;
 
 
 public class Imshow {
-    static final Logger log = LogManager.getLogger("main");
+    private static final Logger log = LogManager.getLogger("main");
 
-    public JFrame Window;
-    private ImageIcon image;
-    private JLabel label;
-    private Boolean SizeCustom;
+    private final JFrame Window;
+    private final ImageIcon image;
+    private final JLabel label;
+    private final Boolean SizeCustom;
     private int Height, Width;
 
     public Imshow(String title) {
@@ -41,10 +41,10 @@ public class Imshow {
         Window.setResizable(false);
         Window.setTitle(title);
         SizeCustom = false;
-        setCloseOption(0);
+        setCloseOption();
     }
 
-    public Imshow(String title, int height, int width) {
+    private Imshow(String title, int height, int width) {
         SizeCustom = true;
         Height = height;
         Width = width;
@@ -56,72 +56,9 @@ public class Imshow {
         Window.getContentPane().add(label);
         Window.setResizable(false);
         Window.setTitle(title);
-        setCloseOption(0);
+        setCloseOption();
 
     }
-
-    public void showImage(Mat img) {
-        if (SizeCustom) {
-            Imgproc.resize(img, img, new Size(Height, Width));
-        }
-        BufferedImage bufImage = null;
-        try {
-            bufImage = toBufferedImage(img);
-            image.setImage(bufImage);
-            Window.pack();
-            label.updateUI();
-            Window.setVisible(true);
-        } catch (Exception e) {
-            log.catching(e);
-        }
-    }
-
-    // CREDITS TO DANIEL: http://danielbaggio.blogspot.com.br/ for the improved
-    // version !
-
-    public BufferedImage toBufferedImage(Mat m) {
-        int type = BufferedImage.TYPE_BYTE_GRAY;
-        if (m.channels() > 1) {
-            type = BufferedImage.TYPE_3BYTE_BGR;
-        }
-        int bufferSize = m.channels() * m.cols() * m.rows();
-        byte[] b = new byte[bufferSize];
-        m.get(0, 0, b); // get all the pixels
-        BufferedImage image = new BufferedImage(m.cols(), m.rows(), type);
-        final byte[] targetPixels = ((DataBufferByte) image.getRaster()
-                .getDataBuffer()).getData();
-        System.arraycopy(b, 0, targetPixels, 0, b.length);
-        return image;
-
-    }
-
-
-    public void setCloseOption(int option) {
-
-        switch (option) {
-            case 0:
-                Window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-                break;
-            case 1:
-                Window.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-                break;
-            default:
-                Window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        }
-
-    }
-
-    /**
-     * Sets whether this window should be resizable or not, by default it is not
-     * resizable
-     *
-     * @param resizable <code>true</code> if the window should be resizable,
-     *                  <code>false</code> otherwise
-     */
-    public void setResizable(boolean resizable) {
-        Window.setResizable(resizable);
-    }
-
 
     /**
      * Displays the given {@link Mat} in a new instance of {@link Imshow}
@@ -132,6 +69,9 @@ public class Imshow {
         show(mat, new Dimension(mat.rows(), mat.cols()), "", false,
                 WindowConstants.EXIT_ON_CLOSE);
     }
+
+    // CREDITS TO DANIEL: http://danielbaggio.blogspot.com.br/ for the improved
+    // version !
 
     /**
      * Displays the given {@link Mat} in a new instance of {@link Imshow} with
@@ -207,8 +147,8 @@ public class Imshow {
      * @param resizable      wether the frame is resizable or not
      * @param closeOperation the constant for the default close operation of the frame
      */
-    public static void show(Mat mat, Dimension frameSize, String frameTitle,
-                            boolean resizable, int closeOperation) {
+    private static void show(Mat mat, Dimension frameSize, String frameTitle,
+                             boolean resizable, int closeOperation) {
         Imshow frame = new Imshow(frameTitle, frameSize.height, frameSize.width);
         frame.setResizable(resizable);
 
@@ -218,6 +158,54 @@ public class Imshow {
          */
         frame.Window.setDefaultCloseOperation(closeOperation);
         frame.showImage(mat);
+    }
+
+    private void showImage(Mat img) {
+        if (SizeCustom) {
+            Imgproc.resize(img, img, new Size(Height, Width));
+        }
+        BufferedImage bufImage = null;
+        try {
+            bufImage = toBufferedImage(img);
+            image.setImage(bufImage);
+            Window.pack();
+            label.updateUI();
+            Window.setVisible(true);
+        } catch (Exception e) {
+            log.catching(e);
+        }
+    }
+
+    private BufferedImage toBufferedImage(Mat m) {
+        int type = BufferedImage.TYPE_BYTE_GRAY;
+        if (m.channels() > 1) {
+            type = BufferedImage.TYPE_3BYTE_BGR;
+        }
+        int bufferSize = m.channels() * m.cols() * m.rows();
+        byte[] b = new byte[bufferSize];
+        m.get(0, 0, b); // get all the pixels
+        BufferedImage image = new BufferedImage(m.cols(), m.rows(), type);
+        final byte[] targetPixels = ((DataBufferByte) image.getRaster()
+                .getDataBuffer()).getData();
+        System.arraycopy(b, 0, targetPixels, 0, b.length);
+        return image;
+
+    }
+
+    private void setCloseOption() {
+
+        Window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    }
+
+    /**
+     * Sets whether this window should be resizable or not, by default it is not
+     * resizable
+     *
+     * @param resizable <code>true</code> if the window should be resizable,
+     *                  <code>false</code> otherwise
+     */
+    private void setResizable(boolean resizable) {
+        Window.setResizable(resizable);
     }
 
 }

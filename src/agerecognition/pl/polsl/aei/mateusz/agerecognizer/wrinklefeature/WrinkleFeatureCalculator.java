@@ -23,17 +23,12 @@ import static pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.DetectedObjectsE
  * @author Mateusz Trzeciak
  * Class for detecting wrinkle features in face image.
  */
-public class WrinkleFeature {
-    static final Logger log = LogManager.getLogger("main");
+public class WrinkleFeatureCalculator {
+    private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
-
-    static {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        log.info("OpenCv Core loaded");
-    }
-
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
+    private final ImageProcessing imageProcessing = new ImageProcessing();
     private File path;
     private Mat processedMat;
     private float wrinkleFeatures;
@@ -42,124 +37,57 @@ public class WrinkleFeature {
     private Mat detectedNoseAndEyes;
     private Mat detectedEdges;
 
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        log.info("OpenCv Core loaded");
+    }
+
+    private WrinkleFeatureCalculator() throws WrinkleFeaturesException {
+        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
+        calculateWrinkleFeatures();
+
+    }
+
     /**
      * Detecting face in image and calculating wrinkle featurer
      *
      * @param path            path to processed file
      * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
      */
-    public WrinkleFeature(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
+    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
 
         this.path = path;
         processedMat = Imgcodecs.imread(path.getAbsolutePath());
 
 //        if (isCroppedToFace) {
 //            croppedToFace = processedMat;
-//            new WrinkleFeature();
+//            new WrinkleFeatureCalculator();
 //            return;
 //        }
         grayProcessedMat = faceDetector(processedMat);
         croppedToFace = cropToFace(grayProcessedMat);
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
-        calculateWrinkleFeatures();
+        wrinkleFeatures = calculateWrinkleFeatures();
 
-    }
-
-    private WrinkleFeature() throws WrinkleFeaturesException {
-        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
-        calculateWrinkleFeatures();
-
-    }
-
-    private static List<Rect> calculateCenterOfEye(Rect firstEye, Rect secondEye) {
-
-        Point eyeOne = new Point();
-        Point eyeTwo = new Point();
-
-
-        eyeOne.x = firstEye.x + firstEye.width / 2;
-        eyeOne.y = firstEye.y + firstEye.height / 2;
-
-        eyeTwo.x = secondEye.x + secondEye.width / 2;
-        eyeTwo.y = secondEye.y + secondEye.height / 2;
-
-        Rect tempFirstEye = new Rect((int) eyeOne.x, (int) eyeOne.y, 0, 0);
-        Rect tempSecondEye = new Rect((int) eyeTwo.x, (int) eyeTwo.y, 0, 0);
-
-        List<Rect> eyeballsCenter = new ArrayList<>();
-
-        eyeballsCenter.add(tempFirstEye);
-        eyeballsCenter.add(tempSecondEye);
-
-        return eyeballsCenter;
-    }
-
-    public Mat getGrayProcessedMat() {
-        return grayProcessedMat;
-    }
-
-    public Mat getCroppedToFace() {
-        return croppedToFace;
-    }
-
-    public Mat getProcessedMat() {
-        return processedMat;
-    }
-
-    public Mat getDetectedNoseAndEyes() {
-        return detectedNoseAndEyes;
-    }
-
-    public Mat getDetectedEdges() {
-        return detectedEdges;
-    }
-
-    public Map<DetectedObjectsEnum, List<Rect>> getDetectedObjects() {
-        return detectedObjects;
-    }
-
-    public List<Rect> getWrinkleAreas() {
-        return wrinkleAreas;
-    }
-
-    public float getWrinkleFeatures() {
-        return wrinkleFeatures;
     }
 
     /**
      * Adding faces rectangles to detectedObjectMap, initializes this.grayProcessedMat field (makes gray oryginal image)
-     *
-     * @return
      */
     private Mat faceDetector(Mat image) throws WrinkleFeaturesException {
 
-        grayProcessedMat = image;
         if (processedMat.channels() != 1) {
-            ImageProcessing.makeGrayImage(grayProcessedMat);
+            ImageProcessing.makeGrayImage(image);
         }
         //Drawing a black rectangle to crop a face
         addDetectedObjects(propertiesLoader.getProperty("frontalFaceDetectorPath")
-                , grayProcessedMat
+                , image
                 , FACES);
-        return grayProcessedMat;
+        return image;
 
     }
 
 
-    private void makeMatsAndSomeFieldsNotNull() {
-        String nullJpg = propertiesLoader.getProperty("nullJpg");
-        this.grayProcessedMat = Imgcodecs.imread(nullJpg);
-        this.croppedToFace = Imgcodecs.imread(nullJpg);
-        this.detectedEdges = Imgcodecs.imread(nullJpg);
-        this.detectedNoseAndEyes = Imgcodecs.imread(nullJpg);
-    }
-
-    /**
-     * Initialiaze this.croppedToFace field
-     *
-     * @return
-     * @throws WrinkleFeaturesException when no face is detected
-     */
     private Mat cropToFace(Mat grayImage) throws WrinkleFeaturesException {
         int detectedFaces = detectedObjects.get(FACES).size();
 
@@ -171,11 +99,6 @@ public class WrinkleFeature {
         }
     }
 
-    /**
-     * Detecting pair of eyes an Noses and initialize  this.detectedNoseAndEyes field
-     *
-     * @return
-     */
     private Mat detectPairOfEyesAndNose(Mat image) throws WrinkleFeaturesException {
         //Detect eyes pair
         detectEyesPair(image);
@@ -206,7 +129,7 @@ public class WrinkleFeature {
                 , centerOfEyeTwo);
     }
 
-    private void calculateWrinkleFeatures() throws WrinkleFeaturesException {
+    private float calculateWrinkleFeatures() {
 
         Rect eyePair = detectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
         Rect nose = detectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
@@ -214,11 +137,11 @@ public class WrinkleFeature {
         Rect centerOfFirstEye = detectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(0);
         Rect centerOfSecondEye = detectedObjects.get(DetectedObjectsEnum.EYEBALLS_CENTER).get(1);
 
-        Rect foreheadArea = getRectOfForeheadArea(centerOfFirstEye, centerOfSecondEye);
-        Rect leftCheekArea = getRectOfLeftCheekArea(eyePair, nose);
-        Rect rightCheekArea = getRectOfRightCheekArea(eyePair, nose);
-        Rect leftEyeCornerArea = getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
-        Rect rightEyeCornerArea = getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
+        Rect foreheadArea = ImageProcessing.getRectOfForeheadArea(centerOfFirstEye, centerOfSecondEye);
+        Rect leftCheekArea = ImageProcessing.getRectOfLeftCheekArea(eyePair, nose);
+        Rect rightCheekArea = ImageProcessing.getRectOfRightCheekArea(eyePair, nose);
+        Rect leftEyeCornerArea = ImageProcessing.getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
+        Rect rightEyeCornerArea = ImageProcessing.getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
 
         detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
 
@@ -233,14 +156,20 @@ public class WrinkleFeature {
 
         for (Rect wrinkleArea : wrinkleAreas) {
             whitePixelsInWrinkleAreas += calculateWhitePixels(wrinkleArea);
-            areaOfAllWrinkleAreas += calculateArea(wrinkleArea);
+            areaOfAllWrinkleAreas += imageProcessing.calculateArea(wrinkleArea);
         }
-        wrinkleFeatures = (float) whitePixelsInWrinkleAreas / areaOfAllWrinkleAreas;
+        return (float) whitePixelsInWrinkleAreas / areaOfAllWrinkleAreas;
     }
 
-    private int calculateArea(Rect wrinkleArea) {
-        return wrinkleArea.height * wrinkleArea.width;
+
+    private void makeMatsAndSomeFieldsNotNull() {
+        String nullJpg = propertiesLoader.getProperty("nullJpg");
+        this.grayProcessedMat = Imgcodecs.imread(nullJpg);
+        this.croppedToFace = Imgcodecs.imread(nullJpg);
+        this.detectedEdges = Imgcodecs.imread(nullJpg);
+        this.detectedNoseAndEyes = Imgcodecs.imread(nullJpg);
     }
+
 
     private void detectEyes(Mat croppedImage) throws WrinkleFeaturesException {
         addDetectedObjects(propertiesLoader.getProperty("eyesDetectorPath"), croppedImage
@@ -251,7 +180,7 @@ public class WrinkleFeature {
         Rect firstEyeRectangle = listOfEyesRectangles.get(0);
         Rect secondEyeRectangle = listOfEyesRectangles.get(1);
 
-        List<Rect> eyeballsCenter = calculateCenterOfEye(firstEyeRectangle, secondEyeRectangle);
+        List<Rect> eyeballsCenter = ImageProcessing.calculateCenterOfEye(firstEyeRectangle, secondEyeRectangle);
         detectedObjects.put(DetectedObjectsEnum.EYEBALLS_CENTER, eyeballsCenter);
 
     }
@@ -331,80 +260,36 @@ public class WrinkleFeature {
         return Core.countNonZero(croppedWrinkleArea);
     }
 
-    private Rect getRectOfForeheadArea(Rect centerOfFirstEye, Rect centerOfSecondEye) {
 
-        Point rightEyeCenter;
-        int distanseBetweenEyes = DistanceCalculator.getDistanceFromRect(centerOfFirstEye, centerOfSecondEye);
-
-        if (centerOfFirstEye.x < centerOfSecondEye.x) {
-            rightEyeCenter = new Point(centerOfFirstEye.x, centerOfFirstEye.y);
-        } else {
-            rightEyeCenter = new Point(centerOfSecondEye.x, centerOfSecondEye.y);
-        }
-
-        Point startPointOfForehead = new Point(rightEyeCenter.x, rightEyeCenter.y - distanseBetweenEyes * 0.9);
-        Size sizeOfForehead = new Size(distanseBetweenEyes, distanseBetweenEyes * 0.5);
-
-        return new Rect(startPointOfForehead, sizeOfForehead);
+    public Mat getGrayProcessedMat() {
+        return grayProcessedMat;
     }
 
-
-    private Rect getRectOfRightCheekArea(Rect eyePair, Rect nose) {
-
-        Point lowerLeftOfEyePair = new Point();
-        Point centerOfLeftNoseSide = new Point();
-
-        lowerLeftOfEyePair.x = eyePair.x;
-        lowerLeftOfEyePair.y = eyePair.y + eyePair.height;
-
-        centerOfLeftNoseSide.x = nose.x;
-        centerOfLeftNoseSide.y = nose.y + nose.height / 2;
-
-        return new Rect(lowerLeftOfEyePair, centerOfLeftNoseSide);
+    public Mat getCroppedToFace() {
+        return croppedToFace;
     }
 
-
-    private Rect getRectOfLeftCheekArea(Rect eyePair, Rect nose) {
-
-        Point lowerRightOfEyePair = new Point();
-        Point centerOfRightNoseSide = new Point();
-
-        lowerRightOfEyePair.x = eyePair.x + eyePair.width;
-        lowerRightOfEyePair.y = eyePair.y + eyePair.height;
-
-        centerOfRightNoseSide.x = nose.x + nose.width;
-        centerOfRightNoseSide.y = nose.y + nose.height / 2;
-
-        return new Rect(lowerRightOfEyePair, centerOfRightNoseSide);
+    public Mat getProcessedMat() {
+        return processedMat;
     }
 
-
-    private Rect getRectOfRightEyeCornerArea(Rect rightCheekArea, Rect eyePair) {
-
-        Point startPoint = new Point();
-        Point centerOfLeftSideOfRightCheekArea = new Point();
-
-        startPoint.x = eyePair.x - rightCheekArea.width * (0.5);
-        startPoint.y = eyePair.y + eyePair.height / 2;
-
-        centerOfLeftSideOfRightCheekArea.x = rightCheekArea.x;
-        centerOfLeftSideOfRightCheekArea.y = rightCheekArea.y + rightCheekArea.height / 2;
-
-        return new Rect(startPoint, centerOfLeftSideOfRightCheekArea);
+    public Mat getDetectedNoseAndEyes() {
+        return detectedNoseAndEyes;
     }
 
-    private Rect getRectOfLeftEyeCornerArea(Rect leftCheekArea, Rect eyePair) {
-
-        Point endPoint = new Point();
-        Point centerOfRightSideOfEyePair = new Point();
-
-        centerOfRightSideOfEyePair.x = eyePair.x + eyePair.width;
-        centerOfRightSideOfEyePair.y = eyePair.y + eyePair.height / 2;
-
-        endPoint.x = leftCheekArea.x + leftCheekArea.width + leftCheekArea.width * (0.4);
-        endPoint.y = leftCheekArea.y + leftCheekArea.height / 2;
-
-        return new Rect(centerOfRightSideOfEyePair, endPoint);
+    public Mat getDetectedEdges() {
+        return detectedEdges;
     }
 
+    public Map<DetectedObjectsEnum, List<Rect>> getDetectedObjects() {
+        return detectedObjects;
+    }
+
+    public List<Rect> getWrinkleAreas() {
+        return wrinkleAreas;
+    }
+
+    public float getWrinkleFeatures() {
+        return wrinkleFeatures;
+    }
 }

@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class AgeToWrinkleJsonFile extends FileProduct {
-    private static String dir = propertiesLoader.getProperty("pathToData");
-    private static String filename = propertiesLoader.getProperty("ageToWrinkleJsonData");
+    private static final String dir = propertiesLoader.getProperty("pathToData");
+    private static final String filename = propertiesLoader.getProperty("ageToWrinkleJsonData");
 
     public static int nextIntegerCounter() {
         //iterate over file in dir

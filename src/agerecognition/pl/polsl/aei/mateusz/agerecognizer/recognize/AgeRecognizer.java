@@ -3,7 +3,7 @@ package pl.polsl.aei.mateusz.agerecognizer.recognize;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
-import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.File;
 
@@ -14,6 +14,7 @@ public class AgeRecognizer {
     public static void recognizeAge(File imagePath) {
         File[] images = imagePath.listFiles();
 
+        assert images != null;
         for (File image : images) {
             int detectedAge = 0;
             try {
@@ -29,9 +30,9 @@ public class AgeRecognizer {
      * Returning calculated age from image.
      */
     private static int detectAgeFromWrinkleFeature(File image) throws WrinkleFeaturesException {
-        WrinkleFeature wrinkleFeature = new WrinkleFeature(image, false);
+        WrinkleFeatureCalculator wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
 
-        float wrinklesPercent = wrinkleFeature.getWrinkleFeatures();
+        float wrinklesPercent = wrinkleFeatureCalculator.getWrinkleFeatures();
         //TODO Wykrywanie wieku na podstawie klasyfikatora
         return (int) (1 / (Math.pow(wrinklesPercent, 2) * 1.98531412899040e-05
                 + 0.000912187996975040 * wrinklesPercent

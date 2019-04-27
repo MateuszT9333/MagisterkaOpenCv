@@ -2,7 +2,7 @@ package pl.polsl.aei.mateusz.agerecognizer.exceptions;
 
 
 public class WrinkleFeaturesException extends Exception {
-    private String message = "";
+    private final String message;
 
     public WrinkleFeaturesException(String message) {
         message = "WrinkleFeatureException: " + message;
