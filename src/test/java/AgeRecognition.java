@@ -1,5 +1,3 @@
-package pl.polsl.aei.mateusz.agerecognizer;
-
 import org.junit.Test;
 import pl.polsl.aei.mateusz.agerecognizer.recognize.AgeRecognizer;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
