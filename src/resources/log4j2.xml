@@ -7,8 +7,8 @@
         <RollingFile
                 name="mainF"
                 immediateFlush="false"
-                fileName="log/app.log"
-                filePattern="log/app.%d{YYYYMMdd_HHmm}_%i.log"
+                fileName="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/log/app.log"
+                filePattern="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/log/app.%d{YYYYMMdd_HHmm}_%i.log"
                 ignoreExceptions="false">
             <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
             <Policies>

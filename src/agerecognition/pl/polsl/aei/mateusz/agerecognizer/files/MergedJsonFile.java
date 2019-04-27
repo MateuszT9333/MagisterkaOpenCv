@@ -3,8 +3,8 @@ package pl.polsl.aei.mateusz.agerecognizer.files;
 import java.io.File;
 
 public class MergedJsonFile extends FileProduct {
-    private static String dir = propertiesLoader.getProperty("pathToData");
-    private String filename = propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData");
+    private static final String dir = propertiesLoader.getProperty("pathToData");
+    private final String filename = propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData");
 
     @Override
     public void createFileWithSuffix(String suffixOfFile) {

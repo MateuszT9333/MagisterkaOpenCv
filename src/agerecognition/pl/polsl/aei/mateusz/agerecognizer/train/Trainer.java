@@ -12,7 +12,7 @@ import pl.polsl.aei.mateusz.agerecognizer.files.FileProduct;
 import pl.polsl.aei.mateusz.agerecognizer.files.FileType;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.AgeToWrinkleFeature;
-import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +34,7 @@ public class Trainer {
 
         File files = new File(propertiesLoader.getProperty("trainingImagesPath") + subPathOfImages);
         File[] imagesInDir = files.listFiles(pathname -> pathname.getName().contains(".")); //only files
+        assert imagesInDir != null;
         if (imagesInDir.length == 0) {
             log.error("No files in this subfolder!");
         }
@@ -46,10 +47,10 @@ public class Trainer {
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
 
         for (File image : imagesInDir) {
-            WrinkleFeature wrinkleFeature;
+            WrinkleFeatureCalculator wrinkleFeatureCalculator;
 
             try {
-                wrinkleFeature = new WrinkleFeature(image, false);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();
@@ -68,7 +69,7 @@ public class Trainer {
             }
             //Succesfully processed wrinkle feature
             validProcessedImages++;
-            float wrinkleFeatureResult = wrinkleFeature.getWrinkleFeatures();
+            float wrinkleFeatureResult = wrinkleFeatureCalculator.getWrinkleFeatures();
             byte age = getAgeFromPath(image.getName());
             ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult)); //write result to file
 
@@ -118,9 +119,7 @@ public class Trainer {
 
     /**
      * Cluster data by age to wrinkle features set
-     *
-     * @param mergedAgeToWrinkleFeatureJsonPath
-     * @info Program zawiesza się, więc obliczanie clusterow odbywa się za pomocą Matlaba
+     * Program zawiesza się, więc obliczanie clusterow odbywa się za pomocą Matlaba
      */
     public static void clusterDataByFuzzyKMeans(String mergedAgeToWrinkleFeatureJsonPath) {
         List<AgeToWrinkleFeature> ageToWrinkleFeatures = new ArrayList<>();

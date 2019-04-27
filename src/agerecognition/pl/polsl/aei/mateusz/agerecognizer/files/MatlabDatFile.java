@@ -6,8 +6,8 @@ import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.AgeToWrinkleFeature;
 import java.io.File;
 
 public class MatlabDatFile extends FileProduct {
-    private static String dir = propertiesLoader.getProperty("pathToData");
-    private String filename = propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData");
+    private static final String dir = propertiesLoader.getProperty("pathToData");
+    private final String filename = propertiesLoader.getProperty("mergedAgeToWrinkleFeaturesData");
 
     @Override
     public void createFileWithSuffix(String suffixOfFile) {

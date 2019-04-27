@@ -3,6 +3,7 @@ import pl.polsl.aei.mateusz.agerecognizer.train.Trainer;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
+import java.util.Objects;
 
 public class Training {
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
@@ -17,13 +18,13 @@ public class Training {
         boolean process = false;
         File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
         String startFrom = "19";
-        for (File image : images.listFiles()) {
+        for (File image : Objects.requireNonNull(images.listFiles())) {
 
             if (image.getName().contains(startFrom)) {
                 process = true;
             }
 
-            if (process == false) {
+            if (!process) {
                 continue;
             }
 

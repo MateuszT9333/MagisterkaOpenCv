@@ -1,12 +1,9 @@
-/**
- * @author Mateusz Trzeciak
- */
 package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 
-public class DistanceCalculator {
+class DistanceCalculator {
 
     public static int getDistanceFromPoint(Point c1, Point c2) {
         return (int) Math.sqrt(Math.pow((c1.x - c2.x), 2) + Math.pow((c1.y - c2.y), 2));
