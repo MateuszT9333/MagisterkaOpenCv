@@ -1,7 +1,7 @@
 package pl.polsl.aei.mateusz.agerecognizer;
 
 import org.junit.Test;
-import pl.polsl.aei.mateusz.agerecognizer.train.AgeClassifier;
+import pl.polsl.aei.mateusz.agerecognizer.train.Trainer;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import java.io.File;
@@ -11,7 +11,7 @@ public class Training {
 
     @Test
     public void generateDataFromImagesManual() {
-        AgeClassifier.generateDataFromImages("1", "41");
+        Trainer.generateDataFromImages("1", "41");
     }
 
     @Test
@@ -29,19 +29,19 @@ public class Training {
                 continue;
             }
 
-            AgeClassifier.generateDataFromImages("1", image.getName());
+            Trainer.generateDataFromImages("1", image.getName());
             Thread.sleep(10000);
         }
     }
 
     @Test
     public void mergeAgeToWrinkleFeatureJson() {
-        AgeClassifier.mergeAgeToWrinkleFeaturesFromJsons("1");
+        Trainer.mergeAgeToWrinkleFeaturesFromJsons("1");
     }
 
     @Test
     public void clusterDataByFuzzyKMeans() {
-        //   AgeClassifier.clusterDataByFuzzyKMeans("dump\\mergedAgeToWrinkleFeatureJson1.txt");
+        //   Trainer.clusterDataByFuzzyKMeans("dump\\mergedAgeToWrinkleFeatureJson1.txt");
 
     }
 }

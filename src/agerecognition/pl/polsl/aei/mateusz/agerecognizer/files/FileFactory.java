@@ -1,4 +1,4 @@
-package pl.polsl.aei.mateusz.agerecognizer.utils.files;
+package pl.polsl.aei.mateusz.agerecognizer.files;
 
 public class FileFactory {
 

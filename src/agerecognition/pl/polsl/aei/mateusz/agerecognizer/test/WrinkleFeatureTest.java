@@ -1,4 +1,4 @@
-package pl.polsl.aei.mateusz.agerecognizer;
+package pl.polsl.aei.mateusz.agerecognizer.test;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,9 +7,9 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
+import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
-import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeature;
 
 import javax.swing.*;

@@ -1,7 +1,7 @@
 /**
  * @author Mateusz Trzeciak
  */
-package pl.polsl.aei.mateusz.agerecognizer.utils;
+package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
 import org.opencv.core.Point;
 import org.opencv.core.Rect;

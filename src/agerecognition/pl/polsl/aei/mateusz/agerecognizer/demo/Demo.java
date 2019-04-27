@@ -1,4 +1,4 @@
-package pl.polsl.aei.mateusz.agerecognizer.utils;
+package pl.polsl.aei.mateusz.agerecognizer.demo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,6 +6,7 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 
 import javax.swing.*;
 

@@ -6,7 +6,9 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
-import pl.polsl.aei.mateusz.agerecognizer.utils.*;
+import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
+import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
 import javax.swing.*;
 import java.io.File;
@@ -15,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static pl.polsl.aei.mateusz.agerecognizer.utils.DetectedObjectsEnum.*;
+import static pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.DetectedObjectsEnum.*;
 
 /**
  * @author Mateusz Trzeciak

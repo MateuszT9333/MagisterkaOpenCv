@@ -1,4 +1,4 @@
-package pl.polsl.aei.mateusz.agerecognizer.utils;
+package pl.polsl.aei.mateusz.agerecognizer.wrinklefeature;
 
 import org.apache.commons.math3.ml.clustering.Clusterable;
 
