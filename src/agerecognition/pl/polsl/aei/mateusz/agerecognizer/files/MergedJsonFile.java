@@ -8,7 +8,7 @@ public class MergedJsonFile extends FileProduct {
 
     @Override
     public void createFileWithSuffix(String suffixOfFile) {
-        this.file = new File(String.format("%s%s%s.txt", dir, filename, suffixOfFile));
+        this.file = new File(String.format("%s\\%s%s.txt", dir, filename, suffixOfFile));
         setPrintStream(file);
     }
 }

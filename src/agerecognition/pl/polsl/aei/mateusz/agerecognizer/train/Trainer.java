@@ -27,13 +27,12 @@ public class Trainer {
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static FileProduct clusteredJson;
 
-    public static void generateDataFromImages(String trainingSetPrefix, String subPathOfImages) {
+    public static void generateDataFromImages(String trainingSetPrefix, File imagesPath) {
         long startTime = System.currentTimeMillis();
         int invalidProcessedImages = 0;
         int validProcessedImages = 0;
 
-        File files = new File(propertiesLoader.getProperty("trainingImagesPath") + subPathOfImages);
-        File[] imagesInDir = files.listFiles(pathname -> pathname.getName().contains(".")); //only files
+        File[] imagesInDir = imagesPath.listFiles(pathname -> pathname.getName().contains(".")); //only files
         assert imagesInDir != null;
         if (imagesInDir.length == 0) {
             log.error("No files in this subfolder!");
@@ -79,12 +78,15 @@ public class Trainer {
     }
 
     private static void generateStats(long startTime, int invalidProcessedImages, int validProcessedImages) {
-        String correctlyProcessedImages = "\n\nCorrectly processed images: " + validProcessedImages;
+        String correctlyProcessedImages = "Correctly processed images: " + validProcessedImages;
         String incorrectlyProcessedImages = "Incorrectly processed images: " + invalidProcessedImages;
         String processedImages = "Sum of processed images: " + (invalidProcessedImages + validProcessedImages);
-        String exexutionTime = "Execution time: " + ((float) (System.currentTimeMillis() - startTime) / 1000) + " s";
+        String executionTime = "Execution time: " + ((float) (System.currentTimeMillis() - startTime) / 1000) + " s";
 
-        log.info("%s\n%s\n%s\n%s", correctlyProcessedImages, incorrectlyProcessedImages, processedImages, exexutionTime);
+        log.info(correctlyProcessedImages);
+        log.info(incorrectlyProcessedImages);
+        log.info(processedImages);
+        log.info(executionTime);
     }
 
     private static void clusterDataByFuzzyKMeans(List<AgeToWrinkleFeature> ageToWrinkleFeatureList) {

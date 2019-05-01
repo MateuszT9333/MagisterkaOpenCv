@@ -26,6 +26,12 @@ import static pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.DetectedObjectsE
 public class WrinkleFeatureCalculator {
     private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+
+    static {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        log.info("OpenCv Core loaded");
+    }
+
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
     private final ImageProcessing imageProcessing = new ImageProcessing();
@@ -37,16 +43,6 @@ public class WrinkleFeatureCalculator {
     private Mat detectedNoseAndEyes;
     private Mat detectedEdges;
 
-    static {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        log.info("OpenCv Core loaded");
-    }
-
-    private WrinkleFeatureCalculator() throws WrinkleFeaturesException {
-        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
-        calculateWrinkleFeatures();
-
-    }
 
     /**
      * Detecting face in image and calculating wrinkle featurer
@@ -58,12 +54,10 @@ public class WrinkleFeatureCalculator {
 
         this.path = path;
         processedMat = Imgcodecs.imread(path.getAbsolutePath());
+        if (isCroppedToFace) {
+            WrinkleFeatureCalculatorFromCroppedFace();
+        }
 
-//        if (isCroppedToFace) {
-//            croppedToFace = processedMat;
-//            new WrinkleFeatureCalculator();
-//            return;
-//        }
         grayProcessedMat = faceDetector(processedMat);
         croppedToFace = cropToFace(grayProcessedMat);
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
@@ -71,6 +65,12 @@ public class WrinkleFeatureCalculator {
 
     }
 
+    private void WrinkleFeatureCalculatorFromCroppedFace() throws WrinkleFeaturesException {
+        ImageProcessing.makeGrayImage(processedMat);
+        croppedToFace = processedMat;
+        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
+        calculateWrinkleFeatures();
+    }
     /**
      * Adding faces rectangles to detectedObjectMap, initializes this.grayProcessedMat field (makes gray oryginal image)
      */

@@ -12,9 +12,9 @@
                 ignoreExceptions="false">
             <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
             <Policies>
-                <OnStartupTriggeringPolicy/>
+                <!--                <OnStartupTriggeringPolicy/>-->
                 <SizeBasedTriggeringPolicy size="1 MB"/>
-                <TimeBasedTriggeringPolicy/>
+                <!--                <TimeBasedTriggeringPolicy/>-->
             </Policies>
             <DefaultRolloverStrategy max="99"/>
         </RollingFile>

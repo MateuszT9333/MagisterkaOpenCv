@@ -11,7 +11,7 @@ public class MatlabDatFile extends FileProduct {
 
     @Override
     public void createFileWithSuffix(String suffixOfFile) {
-        this.file = new File(String.format("%s%s%s.dat", dir, filename, suffixOfFile));
+        this.file = new File(String.format("%s\\%s%s.dat", dir, filename, suffixOfFile));
         setPrintStream(file);
     }
 
