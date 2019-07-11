@@ -3,6 +3,8 @@ package pl.polsl.aei.mateusz.agerecognizer.recognize;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.utils.AgeSection;
+import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleToAgeFunction;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.File;
@@ -16,26 +18,34 @@ public class AgeRecognizer {
 
         assert images != null;
         for (File image : images) {
-            int detectedAge = 0;
+            WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
             try {
-                detectedAge = AgeRecognizer.detectAgeFromWrinkleFeature(image);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
             } catch (WrinkleFeaturesException e) {
-                log.error(e.getMessage());
+                e.printStackTrace();
             }
+            float wrinklesPercent = wrinkleFeatureCalculator.getWrinkleFeatures();
+            int detectedAge = detectAgeFromWrinkleFeature(wrinklesPercent);
+            String detectedAgeSection = detectAgeSectionFromWrinkleFeature(wrinklesPercent);
+
             log.info(String.format("Detected age for image %s: %d", image, detectedAge));
+            log.info(String.format("Detected age section for image %s: %s", image, detectedAgeSection));
         }
+    }
+
+    private static String detectAgeSectionFromWrinkleFeature(float wrinklesPercent) {
+        return AgeSection.getAgeSectionFromWrinkleFeature(wrinklesPercent);
+
     }
 
     /**
      * Returning calculated age from image.
+     *
+     * @param wrinklesPercent
      */
-    private static int detectAgeFromWrinkleFeature(File image) throws WrinkleFeaturesException {
-        WrinkleFeatureCalculator wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
+    private static int detectAgeFromWrinkleFeature(float wrinklesPercent) {
 
-        float wrinklesPercent = wrinkleFeatureCalculator.getWrinkleFeatures();
-        //TODO Wykrywanie wieku na podstawie klasyfikatora
-        return (int) (1 / (Math.pow(wrinklesPercent, 2) * 1.98531412899040e-05
-                + 0.000912187996975040 * wrinklesPercent
-                + 0.000963979767558933));
+        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureNonLinearFunction(wrinklesPercent);
+//        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureLinearFunction(wrinklesPercent);
     }
 }
