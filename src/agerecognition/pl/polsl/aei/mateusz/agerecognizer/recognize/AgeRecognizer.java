@@ -28,6 +28,7 @@ public class AgeRecognizer {
             int detectedAge = detectAgeFromWrinkleFeature(wrinklesPercent);
             String detectedAgeSection = detectAgeSectionFromWrinkleFeature(wrinklesPercent);
 
+            log.info(String.format("Detected wrinkle percent for image %s: %s", image, wrinklesPercent));
             log.info(String.format("Detected age for image %s: %d", image, detectedAge));
             log.info(String.format("Detected age section for image %s: %s", image, detectedAgeSection));
         }

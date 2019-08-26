@@ -17,7 +17,7 @@ class ImageProcessing {
     static Rect getRectOfForeheadArea(Rect centerOfFirstEye, Rect centerOfSecondEye) {
 
         Point rightEyeCenter;
-        int distanseBetweenEyes = DistanceCalculator.getDistanceFromRect(centerOfFirstEye, centerOfSecondEye);
+        int distanceBetweenEyes = DistanceCalculator.getDistanceFromRect(centerOfFirstEye, centerOfSecondEye);
 
         if (centerOfFirstEye.x < centerOfSecondEye.x) {
             rightEyeCenter = new Point(centerOfFirstEye.x, centerOfFirstEye.y);
@@ -25,8 +25,8 @@ class ImageProcessing {
             rightEyeCenter = new Point(centerOfSecondEye.x, centerOfSecondEye.y);
         }
 
-        Point startPointOfForehead = new Point(rightEyeCenter.x, rightEyeCenter.y - distanseBetweenEyes * 0.9);
-        Size sizeOfForehead = new Size(distanseBetweenEyes, distanseBetweenEyes * 0.5);
+        Point startPointOfForehead = new Point(rightEyeCenter.x, rightEyeCenter.y - distanceBetweenEyes * 0.9);
+        Size sizeOfForehead = new Size(distanceBetweenEyes, distanceBetweenEyes * 0.5);
 
         return new Rect(startPointOfForehead, sizeOfForehead);
     }
@@ -179,6 +179,10 @@ class ImageProcessing {
         } catch (InterruptedException e) {
             log.catching(e);
         }
+    }
+
+    public static Rect getRectOfBetweenEyesArea(Rect eyePair) {
+        return null;
     }
 
     int calculateArea(Rect wrinkleArea) {

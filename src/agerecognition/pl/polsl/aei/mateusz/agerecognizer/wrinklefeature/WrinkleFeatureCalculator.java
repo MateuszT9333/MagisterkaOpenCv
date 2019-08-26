@@ -142,7 +142,8 @@ public class WrinkleFeatureCalculator {
         Rect rightCheekArea = ImageProcessing.getRectOfRightCheekArea(eyePair, nose);
         Rect leftEyeCornerArea = ImageProcessing.getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = ImageProcessing.getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
-
+        Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(eyePair);
+        //TODO dodatkowe miejsce na gorny obszar nosa
         detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
 
         wrinkleAreas.add(foreheadArea);
@@ -150,10 +151,11 @@ public class WrinkleFeatureCalculator {
         wrinkleAreas.add(rightCheekArea);
         wrinkleAreas.add(leftEyeCornerArea);
         wrinkleAreas.add(rightEyeCornerArea);
+        wrinkleAreas.add(betweenEyesArea);
 
         int whitePixelsInWrinkleAreas = 0;
         int areaOfAllWrinkleAreas = 0;
-
+        //TODO zmiana sposobu liczenia
         for (Rect wrinkleArea : wrinkleAreas) {
             whitePixelsInWrinkleAreas += calculateWhitePixels(wrinkleArea);
             areaOfAllWrinkleAreas += imageProcessing.calculateArea(wrinkleArea);
