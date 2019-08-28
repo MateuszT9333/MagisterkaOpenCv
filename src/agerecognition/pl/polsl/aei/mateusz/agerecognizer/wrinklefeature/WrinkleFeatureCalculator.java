@@ -142,7 +142,7 @@ public class WrinkleFeatureCalculator {
         Rect rightCheekArea = ImageProcessing.getRectOfRightCheekArea(eyePair, nose);
         Rect leftEyeCornerArea = ImageProcessing.getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = ImageProcessing.getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
-        Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(eyePair);
+        Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(foreheadArea);
         //TODO dodatkowe miejsce na gorny obszar nosa
         detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
 
