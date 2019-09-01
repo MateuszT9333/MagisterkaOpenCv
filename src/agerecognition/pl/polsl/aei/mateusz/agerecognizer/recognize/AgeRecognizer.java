@@ -15,12 +15,12 @@ public class AgeRecognizer {
 
     public static void recognizeAge(File imagePath) {
         File[] images = imagePath.listFiles();
-
+        boolean originalMethod = true;
         assert images != null;
         for (File image : images) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalMethod);
             } catch (WrinkleFeaturesException e) {
                 e.printStackTrace();
             }

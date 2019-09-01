@@ -32,8 +32,9 @@ public class WrinkleFeatureCalculatorTest {
     @Test
     public void faceDetectorTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        boolean originalMethod = true;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalMethod);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -52,8 +53,9 @@ public class WrinkleFeatureCalculatorTest {
     @Test
     public void detectPairOfEyesNoseTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        boolean originalMethod = true;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalMethod);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -65,8 +67,9 @@ public class WrinkleFeatureCalculatorTest {
     @Test
     public void detectEdgesTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        boolean originalMethod = true;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalMethod);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -83,8 +86,9 @@ public class WrinkleFeatureCalculatorTest {
     @Test
     public void calculateWrinkleFeaturesTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        boolean originalMethod = false;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalMethod);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -97,9 +101,10 @@ public class WrinkleFeatureCalculatorTest {
     @Test
     public void showGeneratedImages() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        boolean originalMethod = true;
         //fileExists(processedImage);
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalMethod);
         } catch (Throwable e) {
             log.catching(e);
         }

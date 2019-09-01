@@ -35,6 +35,7 @@ public class WrinkleFeatureCalculator {
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
     private final ImageProcessing imageProcessing = new ImageProcessing();
+    private final boolean originalMethod;
     private File path;
     private Mat processedMat;
     private float wrinkleFeatures;
@@ -50,8 +51,8 @@ public class WrinkleFeatureCalculator {
      * @param path            path to processed file
      * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
      */
-    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace) throws WrinkleFeaturesException {
-
+    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace, boolean originalMethod) throws WrinkleFeaturesException {
+        this.originalMethod = originalMethod;
         this.path = path;
         processedMat = Imgcodecs.imread(path.getAbsolutePath());
         if (isCroppedToFace) {
@@ -71,6 +72,7 @@ public class WrinkleFeatureCalculator {
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
         calculateWrinkleFeatures();
     }
+
     /**
      * Adding faces rectangles to detectedObjectMap, initializes this.grayProcessedMat field (makes gray oryginal image)
      */
@@ -92,7 +94,7 @@ public class WrinkleFeatureCalculator {
         int detectedFaces = detectedObjects.get(FACES).size();
 
         if (detectedFaces > 1) {
-            throw new WrinkleFeaturesException(this.path.getName() + ": To much faces detected.");
+            throw new WrinkleFeaturesException(this.path.toString() + ": To much faces detected.");
         } else {
             Rect detectedFace = detectedObjects.get(FACES).get(0);
             return ImageProcessing.generateCroppedMat(grayImage, detectedFace);
@@ -129,7 +131,7 @@ public class WrinkleFeatureCalculator {
                 , centerOfEyeTwo);
     }
 
-    private float calculateWrinkleFeatures() {
+    private float calculateWrinkleFeatures() throws WrinkleFeaturesException {
 
         Rect eyePair = detectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
         Rect nose = detectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
@@ -142,8 +144,7 @@ public class WrinkleFeatureCalculator {
         Rect rightCheekArea = ImageProcessing.getRectOfRightCheekArea(eyePair, nose);
         Rect leftEyeCornerArea = ImageProcessing.getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = ImageProcessing.getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
-        Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(foreheadArea);
-        //TODO dodatkowe miejsce na gorny obszar nosa
+
         detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
 
         wrinkleAreas.add(foreheadArea);
@@ -151,16 +152,23 @@ public class WrinkleFeatureCalculator {
         wrinkleAreas.add(rightCheekArea);
         wrinkleAreas.add(leftEyeCornerArea);
         wrinkleAreas.add(rightEyeCornerArea);
-        wrinkleAreas.add(betweenEyesArea);
 
-        int whitePixelsInWrinkleAreas = 0;
-        int areaOfAllWrinkleAreas = 0;
-        //TODO zmiana sposobu liczenia
-        for (Rect wrinkleArea : wrinkleAreas) {
-            whitePixelsInWrinkleAreas += calculateWhitePixels(wrinkleArea);
-            areaOfAllWrinkleAreas += imageProcessing.calculateArea(wrinkleArea);
+        if (this.originalMethod) {
+            Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(foreheadArea);
+            wrinkleAreas.add(betweenEyesArea);
         }
-        return (float) whitePixelsInWrinkleAreas / areaOfAllWrinkleAreas;
+
+        float wrinkleFactor = 0;
+        for (Rect wrinkleArea : wrinkleAreas) {
+            float whitePixels = calculateWhitePixels(wrinkleArea);
+            float allPixels = imageProcessing.calculateArea(wrinkleArea);
+            wrinkleFactor += whitePixels / allPixels;
+        }
+        if (Float.isNaN(wrinkleFactor)) {
+            throw new WrinkleFeaturesException("NaN");
+        }
+        return wrinkleFactor;
+
     }
 
 
@@ -232,16 +240,16 @@ public class WrinkleFeatureCalculator {
         if (((kindOfDetectedObject == DetectedObjectsEnum.EYE_PAIR)
                 || (kindOfDetectedObject == DetectedObjectsEnum.NOSE))
                 && sizeOfObjectDetectionList != 1) {
-            throw new WrinkleFeaturesException(this.path.getName() + ": Invalid number of detected nose or eye pair.");
+            throw new WrinkleFeaturesException(this.path.toString() + ": Invalid number of detected nose or eye pair.");
         }
         // If detected number of eyes and center of eyes is not equal to throw WrinkleFeaturesException
         if ((kindOfDetectedObject == DetectedObjectsEnum.EYES)
                 && (sizeOfObjectDetectionList != 2)) {
-            throw new WrinkleFeaturesException(this.path.getName() + ": Invalid number of detected eyes.");
+            throw new WrinkleFeaturesException(this.path.toString() + ": Invalid number of detected eyes.");
         }
 
         if (kindOfDetectedObject == DetectedObjectsEnum.FACES && sizeOfObjectDetectionList == 0) {
-            throw new WrinkleFeaturesException(this.path.getName() + ": No face detected.");
+            throw new WrinkleFeaturesException(this.path.toString() + ": No face detected.");
         }
 
         //Mapping kindOfObject e.g. nose to list of Rect which defining coordinates on image of detected objects.

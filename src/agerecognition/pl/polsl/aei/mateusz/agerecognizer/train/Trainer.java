@@ -44,12 +44,12 @@ public class Trainer {
         int integerCounter = AgeToWrinkleJsonFile.nextIntegerCounter(); //next integer counter in suffix of file name
         String suffixOfFile = String.format("%s_%d", trainingSetPrefix, integerCounter);
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
-
+        boolean originalMethod = true;
         for (File image : imagesInDir) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalMethod);
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();
