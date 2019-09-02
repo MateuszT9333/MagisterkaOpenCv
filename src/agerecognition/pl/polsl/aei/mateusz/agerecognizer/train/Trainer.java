@@ -44,7 +44,7 @@ public class Trainer {
         int integerCounter = AgeToWrinkleJsonFile.nextIntegerCounter(); //next integer counter in suffix of file name
         String suffixOfFile = String.format("%s_%d", trainingSetPrefix, integerCounter);
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
-        boolean originalMethod = true;
+        boolean originalMethod = false;
         for (File image : imagesInDir) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 

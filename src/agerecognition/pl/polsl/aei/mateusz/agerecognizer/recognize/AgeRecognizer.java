@@ -4,14 +4,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.utils.AgeSection;
-import pl.polsl.aei.mateusz.agerecognizer.utils.WrinkleToAgeFunction;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AgeRecognizer {
     private static final Logger log = LogManager.getLogger("main");
-
+    private static float[] wrinkleCenters = {1, 2, 3, 4, 5};
+    private static float[] ageCenters = {10, 20, 30, 40, 50};
 
     public static void recognizeAge(File imagePath) {
         File[] images = imagePath.listFiles();
@@ -42,11 +44,28 @@ public class AgeRecognizer {
     /**
      * Returning calculated age from image.
      *
-     * @param wrinklesPercent
+     * @param wrinklesFeature
      */
-    private static int detectAgeFromWrinkleFeature(float wrinklesPercent) {
+    public static int detectAgeFromWrinkleFeature(float wrinklesFeature) {
+        List<Float> pij = new ArrayList<>(); // membership values
+        for (int i = 0; i < wrinkleCenters.length; i++) {
+            float sum = 0;
+            for (int j = 0; j < wrinkleCenters.length; j++) {
+                float num = wrinklesFeature - wrinkleCenters[i];
+                float den = wrinklesFeature - wrinkleCenters[j];
+                if (den == 0) den = (float) 0.00001;
+                sum += Math.pow((num / den), 2);
+            }
+            pij.add(1 / sum);
+        }
 
-        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureNonLinearFunction(wrinklesPercent);
+        float age = 0;
+        for (int i = 0; i < ageCenters.length; i++) {
+            if (pij.get(i) > 1) pij.set(i, 1f);
+            age += pij.get(i) * ageCenters[i];
+        }
+        return (int) age;
+//        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureNonLinearFunction(wrinklesPercent);
 //        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureLinearFunction(wrinklesPercent);
     }
 }
