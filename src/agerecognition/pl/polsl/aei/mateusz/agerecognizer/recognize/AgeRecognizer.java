@@ -3,7 +3,6 @@ package pl.polsl.aei.mateusz.agerecognizer.recognize;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
-import pl.polsl.aei.mateusz.agerecognizer.utils.AgeSection;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.File;
@@ -12,12 +11,15 @@ import java.util.List;
 
 public class AgeRecognizer {
     private static final Logger log = LogManager.getLogger("main");
-    private static float[] wrinkleCenters = {1, 2, 3, 4, 5};
-    private static float[] ageCenters = {10, 20, 30, 40, 50};
+    private static float[] wrinkleCentersOriginalMethod = {1, 2, 3, 4, 5};
+    private static float[] ageCentersOriginalMethod = {10, 20, 30, 40, 50};
+
+    private static float[] wrinkleCentersCustomMethod = {1, 2, 3, 4, 5};
+    private static float[] ageCentersCustomMethod = {10, 20, 30, 40, 50};
+    private static boolean originalMethod = true;
 
     public static void recognizeAge(File imagePath) {
         File[] images = imagePath.listFiles();
-        boolean originalMethod = true;
         assert images != null;
         for (File image : images) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
@@ -25,20 +27,14 @@ public class AgeRecognizer {
                 wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalMethod);
             } catch (WrinkleFeaturesException e) {
                 e.printStackTrace();
+                continue;
             }
             float wrinklesPercent = wrinkleFeatureCalculator.getWrinkleFeatures();
             int detectedAge = detectAgeFromWrinkleFeature(wrinklesPercent);
-            String detectedAgeSection = detectAgeSectionFromWrinkleFeature(wrinklesPercent);
 
             log.info(String.format("Detected wrinkle percent for image %s: %s", image, wrinklesPercent));
             log.info(String.format("Detected age for image %s: %d", image, detectedAge));
-            log.info(String.format("Detected age section for image %s: %s", image, detectedAgeSection));
         }
-    }
-
-    private static String detectAgeSectionFromWrinkleFeature(float wrinklesPercent) {
-        return AgeSection.getAgeSectionFromWrinkleFeature(wrinklesPercent);
-
     }
 
     /**
@@ -47,6 +43,12 @@ public class AgeRecognizer {
      * @param wrinklesFeature
      */
     public static int detectAgeFromWrinkleFeature(float wrinklesFeature) {
+        float[] wrinkleCenters;
+        float[] ageCenters;
+
+        wrinkleCenters = originalMethod ? wrinkleCentersOriginalMethod : wrinkleCentersCustomMethod;
+        ageCenters = originalMethod ? ageCentersOriginalMethod : ageCentersCustomMethod;
+
         List<Float> pij = new ArrayList<>(); // membership values
         for (int i = 0; i < wrinkleCenters.length; i++) {
             float sum = 0;
@@ -65,7 +67,5 @@ public class AgeRecognizer {
             age += pij.get(i) * ageCenters[i];
         }
         return (int) age;
-//        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureNonLinearFunction(wrinklesPercent);
-//        return (int) WrinkleToAgeFunction.getAgeFromWrinkleFeatureLinearFunction(wrinklesPercent);
     }
 }
