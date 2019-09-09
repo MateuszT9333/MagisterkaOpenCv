@@ -102,7 +102,7 @@ public class Trainer {
     }
 
 
-    private static byte getAgeFromPath(String image) {
+    public static byte getAgeFromPath(String image) {
         try {
             String processedString = image.subSequence(0, 3).toString();
             String[] numbers = processedString.split("_");
