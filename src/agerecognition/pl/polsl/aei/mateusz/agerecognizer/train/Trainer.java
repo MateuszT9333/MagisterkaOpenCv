@@ -27,6 +27,9 @@ public class Trainer {
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static FileProduct clusteredJson;
 
+    static boolean originalRectangles = false;
+    static boolean hog = false;
+
     public static void generateDataFromImages(String trainingSetPrefix, File imagesPath) {
         long startTime = System.currentTimeMillis();
         int invalidProcessedImages = 0;
@@ -44,12 +47,11 @@ public class Trainer {
         int integerCounter = AgeToWrinkleJsonFile.nextIntegerCounter(); //next integer counter in suffix of file name
         String suffixOfFile = String.format("%s_%d", trainingSetPrefix, integerCounter);
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
-        boolean originalMethod = false;
         for (File image : imagesInDir) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalMethod);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hog);
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();

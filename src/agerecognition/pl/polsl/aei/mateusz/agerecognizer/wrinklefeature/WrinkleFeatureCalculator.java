@@ -35,7 +35,8 @@ public class WrinkleFeatureCalculator {
     private final Map<DetectedObjectsEnum, List<Rect>> detectedObjects = new HashMap<>();
     private final List<Rect> wrinkleAreas = new ArrayList<>();
     private final ImageProcessing imageProcessing = new ImageProcessing();
-    private final boolean originalMethod;
+    private final boolean originalRectangles;
+    private final boolean hog;
     private File path;
     private Mat processedMat;
     private float wrinkleFeatures;
@@ -51,12 +52,18 @@ public class WrinkleFeatureCalculator {
      * @param path            path to processed file
      * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
      */
-    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace, boolean originalMethod) throws WrinkleFeaturesException {
-        this.originalMethod = originalMethod;
+    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace, boolean originalRectangles, boolean hog) throws WrinkleFeaturesException {
+        this.originalRectangles = originalRectangles;
+        this.hog = hog;
         this.path = path;
         processedMat = Imgcodecs.imread(path.getAbsolutePath());
+        if (hog) {
+            WrinkleFeatureCalculatorWithHog();
+            return;
+        }
         if (isCroppedToFace) {
             WrinkleFeatureCalculatorFromCroppedFace();
+            return;
         }
 
         grayProcessedMat = faceDetector(processedMat);
@@ -64,6 +71,13 @@ public class WrinkleFeatureCalculator {
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
         wrinkleFeatures = calculateWrinkleFeatures();
 
+    }
+
+    private void WrinkleFeatureCalculatorWithHog() throws WrinkleFeaturesException {
+        grayProcessedMat = faceDetector(processedMat);
+        croppedToFace = cropToFace(grayProcessedMat);
+        detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
+        wrinkleFeatures = calculateWrinkleFeaturesFromHog();
     }
 
     private void WrinkleFeatureCalculatorFromCroppedFace() throws WrinkleFeaturesException {
@@ -131,8 +145,29 @@ public class WrinkleFeatureCalculator {
                 , centerOfEyeTwo);
     }
 
+    private float calculateWrinkleFeaturesFromHog() {
+        createWrinkleAreas();
+//TODO hog
+        return 0;
+    }
     private float calculateWrinkleFeatures() throws WrinkleFeaturesException {
 
+        createWrinkleAreas();
+
+        float wrinkleFactor = 0;
+        for (Rect wrinkleArea : wrinkleAreas) {
+            float whitePixels = calculateWhitePixels(wrinkleArea);
+            float allPixels = imageProcessing.calculateArea(wrinkleArea);
+            wrinkleFactor += whitePixels / allPixels;
+        }
+        if (Float.isNaN(wrinkleFactor)) {
+            throw new WrinkleFeaturesException("NaN");
+        }
+        return wrinkleFactor;
+
+    }
+
+    private void createWrinkleAreas() {
         Rect eyePair = detectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
         Rect nose = detectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
 
@@ -153,22 +188,10 @@ public class WrinkleFeatureCalculator {
         wrinkleAreas.add(leftEyeCornerArea);
         wrinkleAreas.add(rightEyeCornerArea);
 
-        if (this.originalMethod) {
+        if (this.originalRectangles) {
             Rect betweenEyesArea = ImageProcessing.getRectOfBetweenEyesArea(foreheadArea);
             wrinkleAreas.add(betweenEyesArea);
         }
-
-        float wrinkleFactor = 0;
-        for (Rect wrinkleArea : wrinkleAreas) {
-            float whitePixels = calculateWhitePixels(wrinkleArea);
-            float allPixels = imageProcessing.calculateArea(wrinkleArea);
-            wrinkleFactor += whitePixels / allPixels;
-        }
-        if (Float.isNaN(wrinkleFactor)) {
-            throw new WrinkleFeaturesException("NaN");
-        }
-        return wrinkleFactor;
-
     }
 
 

@@ -19,9 +19,10 @@ public class AgeRecognizer {
     private static float[] ageCenters;
 
 
-    private static boolean originalMethod = true;
-    private static String trainingTitle = "Original method: " + originalMethod + "options = [2.0 100 1e-5 1];\n" +
-            "numberOfClusters = 10;";
+    private static boolean originalRectangles = false;
+    private static boolean hog = false;
+    private static String trainingTitle = "Original method: " + originalRectangles + ", options = [2.0 1000 1e-5 1];\n" +
+            "numberOfClusters = 100, " + hog;
 
     public static void recognizeAge(File imagePath) throws IOException {
         List<String> real2Recognized = new ArrayList<>();
@@ -32,7 +33,7 @@ public class AgeRecognizer {
         for (File image : images) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalMethod);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hog);
             } catch (WrinkleFeaturesException e) {
                 e.printStackTrace();
                 continue;
