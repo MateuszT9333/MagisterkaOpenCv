@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-class ImageProcessing {
+public class ImageProcessing {
     private static final Logger log = LogManager.getLogger("main");
     private static Point rightEyeCenter;
     private static Point leftEyeCenter;
@@ -156,7 +156,7 @@ class ImageProcessing {
         return new Mat(processedImage, rectangleOfFaceToCrop);
     }
 
-    static void makeGrayImage(Mat oryginal) {
+    public static void makeGrayImage(Mat oryginal) {
         Mat originalCopy = oryginal.clone();
         Imgproc.cvtColor(originalCopy, oryginal, Imgproc.COLOR_BGR2GRAY);
     }
