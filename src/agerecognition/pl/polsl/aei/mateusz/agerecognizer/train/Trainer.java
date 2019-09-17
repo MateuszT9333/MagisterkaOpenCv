@@ -10,6 +10,7 @@ import pl.polsl.aei.mateusz.agerecognizer.files.AgeToWrinkleJsonFile;
 import pl.polsl.aei.mateusz.agerecognizer.files.FileFactory;
 import pl.polsl.aei.mateusz.agerecognizer.files.FileProduct;
 import pl.polsl.aei.mateusz.agerecognizer.files.FileType;
+import pl.polsl.aei.mateusz.agerecognizer.utils.HogConfig;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.AgeToWrinkleFeature;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
@@ -28,7 +29,7 @@ public class Trainer {
     private static FileProduct clusteredJson;
 
     static boolean originalRectangles = false;
-    static boolean hog = false;
+    final static HogConfig hogConfig = new HogConfig(true, 5, 9);
 
     public static void generateDataFromImages(String trainingSetPrefix, File imagesPath) {
         long startTime = System.currentTimeMillis();
@@ -40,7 +41,7 @@ public class Trainer {
         if (imagesInDir.length == 0) {
             log.error("No files in this subfolder!");
         }
-
+        log.debug("Starting training... originalRectangles: " + originalRectangles + " " + hogConfig);
 //        initializeOutputFilesWriters(trainingSetPrefix, subPathOfImages);
         //create file for results
         FileProduct ageToWrinkleJson = FileFactory.create(FileType.ageToWrinkleJson);
@@ -51,7 +52,7 @@ public class Trainer {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hog);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hogConfig);
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();

@@ -5,6 +5,7 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.HOGDescriptor;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.utils.HogConfig;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.ImageProcessing;
@@ -22,6 +23,7 @@ public class WrinkleFeatureCalculatorTest {
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
 
     private final static File TEST = new File(propertiesLoader.getProperty("test"));
+    private final static File MOJATWARZ = new File(propertiesLoader.getProperty("mojaTwarz"));
     private final static File MAT = new File(propertiesLoader.getProperty("matImage"));
     private static final Logger log = LogManager.getLogger("main");
 
@@ -29,9 +31,9 @@ public class WrinkleFeatureCalculatorTest {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    private final File processedImage = TEST;
+    private final File processedImage = MOJATWARZ;
     boolean originalRectangles = false;
-    boolean hog = false;
+    final static HogConfig hogConfig = new HogConfig(true, 8, 9);
 
     private static void exportImgFeatures(Mat grayMat) {
 
@@ -66,10 +68,10 @@ public class WrinkleFeatureCalculatorTest {
         Size blockStride = cellInPx;
 
         HOGDescriptor hog = new HOGDescriptor(
-                new Size(2, 2), //winSize
+                new Size(4, 4), //winSize
                 new Size(2, 2), //blocksize
                 new Size(1, 1), //blockStride,
-                new Size(2, 2), //cellSize,
+                new Size(1, 1), //cellSize,
                 4); //nbins
 
 //        MatOfFloat descriptors = new MatOfFloat();
@@ -94,7 +96,7 @@ public class WrinkleFeatureCalculatorTest {
     public void faceDetectorTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hog);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -114,7 +116,7 @@ public class WrinkleFeatureCalculatorTest {
     public void detectPairOfEyesNoseTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hog);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
@@ -127,12 +129,12 @@ public class WrinkleFeatureCalculatorTest {
     public void detectEdgesTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hog);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
         assert wrinkleFeatureCalculator != null;
-        Imshow.show(wrinkleFeatureCalculator.getDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeatureCalculator.getFaceWithDetectedEdges(), "Image edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         pause();
     }
 
@@ -145,12 +147,12 @@ public class WrinkleFeatureCalculatorTest {
     public void calculateWrinkleFeaturesTest() {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hog);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
         assert wrinkleFeatureCalculator != null;
-        wrinkleFeatureCalculator.showWrinkleAreas(new Scalar(0, 0, 0));
+//        wrinkleFeatureCalculator.showWrinkleAreas(new Scalar(0, 0, 0));
         log.info("Wrinkle features " + wrinkleFeatureCalculator.getWrinkleFeatures());
         pause();
     }
@@ -160,7 +162,7 @@ public class WrinkleFeatureCalculatorTest {
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         //fileExists(processedImage);
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hog);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
         } catch (Throwable e) {
             log.catching(e);
         }
@@ -168,7 +170,7 @@ public class WrinkleFeatureCalculatorTest {
         Imshow.show(wrinkleFeatureCalculator.getProcessedMat(), "Oryginal", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeatureCalculator.getCroppedToFace(), "Cropped face", WindowConstants.DO_NOTHING_ON_CLOSE);
         Imshow.show(wrinkleFeatureCalculator.getDetectedNoseAndEyes(), "Detected nose and eyes", WindowConstants.DO_NOTHING_ON_CLOSE);
-        Imshow.show(wrinkleFeatureCalculator.getDetectedEdges(), "Detected edges", WindowConstants.DO_NOTHING_ON_CLOSE);
+        Imshow.show(wrinkleFeatureCalculator.getFaceWithDetectedEdges(), "Detected edges", WindowConstants.DO_NOTHING_ON_CLOSE);
         wrinkleFeatureCalculator.showWrinkleAreas(new Scalar(255, 0, 0));
 
         log.info("Wrinkle features " + wrinkleFeatureCalculator.getWrinkleFeatures());

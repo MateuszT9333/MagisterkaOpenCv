@@ -18,7 +18,7 @@ public class Training {
     public void generateDataFromImagesAuto() throws InterruptedException {
         boolean process = false;
         File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
-        String startFrom = "41";
+        String startFrom = "35";
         for (File imagePath : Objects.requireNonNull(images.listFiles())) {
 
             if (imagePath.getName().contains(startFrom)) {
@@ -29,7 +29,7 @@ public class Training {
                 continue;
             }
 
-            Trainer.generateDataFromImages("3", imagePath);
+            Trainer.generateDataFromImages("5hog", imagePath);
             Thread.sleep(10000);
         }
     }

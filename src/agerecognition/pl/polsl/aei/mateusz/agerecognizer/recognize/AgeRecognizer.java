@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
 import pl.polsl.aei.mateusz.agerecognizer.train.Trainer;
+import pl.polsl.aei.mateusz.agerecognizer.utils.HogConfig;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
@@ -20,9 +21,9 @@ public class AgeRecognizer {
 
 
     private static boolean originalRectangles = false;
-    private static boolean hog = false;
+    private final static HogConfig hogConfig = new HogConfig(false);
     private static String trainingTitle = "Original method: " + originalRectangles + ", options = [2.0 1000 1e-5 1];\n" +
-            "numberOfClusters = 100, " + hog;
+            "numberOfClusters = 100, " + hogConfig.isHog();
 
     public static void recognizeAge(File imagePath) throws IOException {
         List<String> real2Recognized = new ArrayList<>();
@@ -33,7 +34,7 @@ public class AgeRecognizer {
         for (File image : images) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hog);
+                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hogConfig);
             } catch (WrinkleFeaturesException e) {
                 e.printStackTrace();
                 continue;

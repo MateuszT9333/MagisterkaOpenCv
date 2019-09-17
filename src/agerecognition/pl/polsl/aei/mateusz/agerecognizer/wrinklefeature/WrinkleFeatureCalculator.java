@@ -5,8 +5,10 @@ import org.apache.logging.log4j.Logger;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.objdetect.HOGDescriptor;
 import org.opencv.objdetect.Objdetect;
 import pl.polsl.aei.mateusz.agerecognizer.exceptions.WrinkleFeaturesException;
+import pl.polsl.aei.mateusz.agerecognizer.utils.HogConfig;
 import pl.polsl.aei.mateusz.agerecognizer.utils.Imshow;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 
@@ -36,28 +38,28 @@ public class WrinkleFeatureCalculator {
     private final List<Rect> wrinkleAreas = new ArrayList<>();
     private final ImageProcessing imageProcessing = new ImageProcessing();
     private final boolean originalRectangles;
-    private final boolean hog;
+    private final HogConfig hogConfig;
     private File path;
     private Mat processedMat;
     private float wrinkleFeatures;
     private Mat grayProcessedMat = null;
     private Mat croppedToFace;
     private Mat detectedNoseAndEyes;
-    private Mat detectedEdges;
+    private Mat faceWithDetectedEdges;
 
 
     /**
      * Detecting face in image and calculating wrinkle featurer
-     *
-     * @param path            path to processed file
+     *  @param path            path to processed file
      * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
+     * @param hogConfig
      */
-    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace, boolean originalRectangles, boolean hog) throws WrinkleFeaturesException {
+    public WrinkleFeatureCalculator(File path, boolean isCroppedToFace, boolean originalRectangles, HogConfig hogConfig) throws WrinkleFeaturesException {
         this.originalRectangles = originalRectangles;
-        this.hog = hog;
+        this.hogConfig = hogConfig;
         this.path = path;
         processedMat = Imgcodecs.imread(path.getAbsolutePath());
-        if (hog) {
+        if (hogConfig.isHog()) {
             WrinkleFeatureCalculatorWithHog();
             return;
         }
@@ -145,11 +147,44 @@ public class WrinkleFeatureCalculator {
                 , centerOfEyeTwo);
     }
 
-    private float calculateWrinkleFeaturesFromHog() {
+    private float calculateWrinkleFeaturesFromHog() throws WrinkleFeaturesException {
         createWrinkleAreas();
-//TODO hog
-        return 0;
+        float wrinkleFactor = 0;
+        for (Rect wrinkleArea : wrinkleAreas) {
+            wrinkleFactor += calculateSumOfHogDescriptors(wrinkleArea);
+        }
+        if (Float.isNaN(wrinkleFactor)) {
+            throw new WrinkleFeaturesException("NaN");
+        }
+        return wrinkleFactor;
     }
+
+    private float calculateSumOfHogDescriptors(Rect wrinkleArea) {
+        double cellSizeInPx = this.hogConfig.getCellSizeInPx();
+        Size cellSize = new Size(cellSizeInPx, cellSizeInPx);
+        Size blockSize = new Size(cellSizeInPx, cellSizeInPx);
+        Size blockStride = new Size(blockSize.width, blockSize.height);
+        Size winSize = new Size(getWindowDimension(wrinkleArea.width), getWindowDimension(wrinkleArea.height));
+
+        Mat wrinkleAreaMat = ImageProcessing.generateCroppedMat(croppedToFace.clone(), wrinkleArea);
+        HOGDescriptor hog = new HOGDescriptor(
+                winSize, //winSize
+                blockSize, //blocksize
+                blockStride, //blockStride,
+                cellSize, //cellSize,
+                this.hogConfig.getNbins()); //nbins
+
+        MatOfFloat descriptors = new MatOfFloat();
+        hog.compute(wrinkleAreaMat, descriptors);
+        float wrinkleFactor = 0;
+        for (float i : descriptors.toArray()) {
+            wrinkleFactor += i;
+        }
+        int cellNumbers = (int) ((winSize.width / cellSizeInPx) * (winSize.height / cellSizeInPx));
+        wrinkleFactor = wrinkleFactor / cellNumbers; //normalization
+        return wrinkleFactor;
+    }
+
     private float calculateWrinkleFeatures() throws WrinkleFeaturesException {
 
         createWrinkleAreas();
@@ -167,6 +202,14 @@ public class WrinkleFeatureCalculator {
 
     }
 
+    private double getWindowDimension(int originalDimension) {
+        int dimension = originalDimension;
+        while (dimension % this.hogConfig.getCellSizeInPx() != 0) {
+            dimension--;
+        }
+        return dimension;
+    }
+
     private void createWrinkleAreas() {
         Rect eyePair = detectedObjects.get(DetectedObjectsEnum.EYE_PAIR).get(0);
         Rect nose = detectedObjects.get(DetectedObjectsEnum.NOSE).get(0);
@@ -179,8 +222,9 @@ public class WrinkleFeatureCalculator {
         Rect rightCheekArea = ImageProcessing.getRectOfRightCheekArea(eyePair, nose);
         Rect leftEyeCornerArea = ImageProcessing.getRectOfLeftEyeCornerArea(leftCheekArea, eyePair);
         Rect rightEyeCornerArea = ImageProcessing.getRectOfRightEyeCornerArea(rightCheekArea, eyePair);
-
-        detectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
+        if (!hogConfig.isHog()) {
+            faceWithDetectedEdges = ImageProcessing.detectEdges(croppedToFace.clone());
+        }
 
         wrinkleAreas.add(foreheadArea);
         wrinkleAreas.add(leftCheekArea);
@@ -199,7 +243,7 @@ public class WrinkleFeatureCalculator {
         String nullJpg = propertiesLoader.getProperty("nullJpg");
         this.grayProcessedMat = Imgcodecs.imread(nullJpg);
         this.croppedToFace = Imgcodecs.imread(nullJpg);
-        this.detectedEdges = Imgcodecs.imread(nullJpg);
+        this.faceWithDetectedEdges = Imgcodecs.imread(nullJpg);
         this.detectedNoseAndEyes = Imgcodecs.imread(nullJpg);
     }
 
@@ -281,15 +325,13 @@ public class WrinkleFeatureCalculator {
 
 
     public void showWrinkleAreas(Scalar scalar) {
-        Mat temp = detectedEdges.clone();
+        Mat temp = faceWithDetectedEdges.clone();
         ImageProcessing.drawARectangleInMat(temp, scalar, wrinkleAreas);
         Imshow.show(temp, "Wrinkle areas", WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
     private float calculateWhitePixels(Rect wrinkleArea) {
-        Mat croppedWrinkleArea = new Mat();
-        Mat croppedMat = ImageProcessing.generateCroppedMat(detectedEdges, wrinkleArea);
-        Core.extractChannel(croppedMat, croppedWrinkleArea, 0);
+        Mat croppedWrinkleArea = ImageProcessing.generateCroppedMat(croppedToFace.clone(), wrinkleArea);
         return Core.countNonZero(croppedWrinkleArea);
     }
 
@@ -310,8 +352,8 @@ public class WrinkleFeatureCalculator {
         return detectedNoseAndEyes;
     }
 
-    public Mat getDetectedEdges() {
-        return detectedEdges;
+    public Mat getFaceWithDetectedEdges() {
+        return faceWithDetectedEdges;
     }
 
     public Map<DetectedObjectsEnum, List<Rect>> getDetectedObjects() {
