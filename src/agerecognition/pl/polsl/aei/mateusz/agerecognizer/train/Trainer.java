@@ -24,17 +24,18 @@ import java.util.List;
 
 public class Trainer {
 
+    final static HogConfig hogConfig = new HogConfig(true, 9, 9);
     private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+    private static final Logger heapLog = LogManager.getLogger("heap");
+    static boolean originalRectangles = false; //true - method from document, false - without area between eyes
     private static FileProduct clusteredJson;
-
-    static boolean originalRectangles = false;
-    final static HogConfig hogConfig = new HogConfig(true, 5, 9);
 
     public static void generateDataFromImages(String trainingSetPrefix, File imagesPath) {
         long startTime = System.currentTimeMillis();
         int invalidProcessedImages = 0;
         int validProcessedImages = 0;
+        Runtime r = Runtime.getRuntime();
 
         File[] imagesInDir = imagesPath.listFiles(pathname -> pathname.getName().contains(".")); //only files
         assert imagesInDir != null;
@@ -50,7 +51,7 @@ public class Trainer {
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
         for (File image : imagesInDir) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
-
+//            heapLog.info("Heap size in %: " + r.totalMemory() * 100 / r.maxMemory());
             try {
                 wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hogConfig);
             } catch (WrinkleFeaturesException e) {
@@ -73,7 +74,7 @@ public class Trainer {
             validProcessedImages++;
             float wrinkleFeatureResult = wrinkleFeatureCalculator.getWrinkleFeatures();
             byte age = getAgeFromPath(image.getName());
-            ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult)); //write result to file
+            ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult, image.getName())); //write result to file
 
             log.info(String.format("Success!: Path: %s: (age: %d | feature: %f)", image.getName(), age, wrinkleFeatureResult));
         }

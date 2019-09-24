@@ -159,7 +159,7 @@ public class WrinkleFeatureCalculator {
         return wrinkleFactor;
     }
 
-    private float calculateSumOfHogDescriptors(Rect wrinkleArea) {
+    private float calculateSumOfHogDescriptors(Rect wrinkleArea) throws WrinkleFeaturesException {
         double cellSizeInPx = this.hogConfig.getCellSizeInPx();
         Size cellSize = new Size(cellSizeInPx, cellSizeInPx);
         Size blockSize = new Size(cellSizeInPx, cellSizeInPx);
@@ -177,8 +177,12 @@ public class WrinkleFeatureCalculator {
         MatOfFloat descriptors = new MatOfFloat();
         hog.compute(wrinkleAreaMat, descriptors);
         float wrinkleFactor = 0;
-        for (float i : descriptors.toArray()) {
-            wrinkleFactor += i;
+        try {
+            for (float i : descriptors.toArray()) {
+                wrinkleFactor += i;
+            }
+        } catch (RuntimeException e) {
+            throw new WrinkleFeaturesException("Native Mat has unexpected type or size, path: " + this.path.getName());
         }
         int cellNumbers = (int) ((winSize.width / cellSizeInPx) * (winSize.height / cellSizeInPx));
         wrinkleFactor = wrinkleFactor / cellNumbers; //normalization

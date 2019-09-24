@@ -21,8 +21,9 @@ public class MatlabDatFile extends FileProduct {
 
         AgeToWrinkleFeature ageToWrinkleFeature = gson.fromJson((String) line, AgeToWrinkleFeature.class);
 
-        this.printStream.println(String.format("   %s   %s"
+        this.printStream.println(String.format("   %s   %s   %s"
                 , ageToWrinkleFeature.age
-                , ageToWrinkleFeature.wrinkleFeature));
+                , ageToWrinkleFeature.wrinkleFeature
+                , ageToWrinkleFeature.filename));
     }
 }

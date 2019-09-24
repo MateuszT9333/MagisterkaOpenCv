@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
+        <Console name="heapC" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
+        </Console>
         <Console name="mainC" target="SYSTEM_OUT">
             <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
         </Console>
         <RollingFile
+                name="heapF"
+                immediateFlush="true"
+                fileName="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/out/log/heap.log"
+                filePattern="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/out/log/heap.%d{YYYYMMdd_HHmm}_%i.log"
+                ignoreExceptions="false">
+            <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
+            <Policies>
+                <!--                <OnStartupTriggeringPolicy/>-->
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+                <!--                <TimeBasedTriggeringPolicy/>-->
+            </Policies>
+            <DefaultRolloverStrategy max="99"/>
+        </RollingFile>
+        <RollingFile
                 name="mainF"
-                immediateFlush="false"
-                fileName="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/log/app.log"
-                filePattern="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/log/app.%d{YYYYMMdd_HHmm}_%i.log"
+                immediateFlush="true"
+                fileName="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/out/log/app.log"
+                filePattern="E:/Workspace/Studia/MagisterkaInfa/AgeRecognizer/out/log/app.%d{YYYYMMdd_HHmm}_%i.log"
                 ignoreExceptions="false">
             <PatternLayout pattern="[%d{YYYY-MM-dd HH:mm:ss.SSS}] [log:%c] [%-5level] - %msg%n"/>
             <Policies>
@@ -27,6 +44,10 @@
         <Logger name="main" additivity="false" level="trace">
             <AppenderRef ref="mainC"/>
             <AppenderRef ref="mainF"/>
+        </Logger>
+        <Logger name="heap" additivity="false" level="trace">
+            <AppenderRef ref="heapC"/>
+            <AppenderRef ref="heapF"/>
         </Logger>
     </Loggers>
 </Configuration>
