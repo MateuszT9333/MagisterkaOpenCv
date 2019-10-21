@@ -42,6 +42,7 @@ public class WrinkleFeatureCalculator {
     private File path;
     private Mat processedMat;
     private float wrinkleFeatures;
+    private float[] wrinkleFeaturesKNN;
     private Mat grayProcessedMat = null;
     private Mat croppedToFace;
     private Mat detectedNoseAndEyes;
@@ -49,7 +50,7 @@ public class WrinkleFeatureCalculator {
 
 
     /**
-     * Detecting face in image and calculating wrinkle featurer
+     * Detecting face in image and calculating wrinkle feature
      *  @param path            path to processed file
      * @param isCroppedToFace If image is cropped to face. Especially for training algorithm
      * @param hogConfig
@@ -79,7 +80,11 @@ public class WrinkleFeatureCalculator {
         grayProcessedMat = faceDetector(processedMat);
         croppedToFace = cropToFace(grayProcessedMat);
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
-        wrinkleFeatures = calculateWrinkleFeaturesFromHog();
+        if (this.hogConfig.isHogKnn()) {
+            wrinkleFeaturesKNN = calculateWrinkleFeaturesFromHogKNN();
+        } else {
+            wrinkleFeatures = calculateWrinkleFeaturesFromHog();
+        }
     }
 
     private void WrinkleFeatureCalculatorFromCroppedFace() throws WrinkleFeaturesException {
@@ -151,12 +156,19 @@ public class WrinkleFeatureCalculator {
         createWrinkleAreas();
         float wrinkleFactor = 0;
         for (Rect wrinkleArea : wrinkleAreas) {
-            wrinkleFactor += calculateSumOfHogDescriptors(wrinkleArea);
+            wrinkleFactor += calculateSumOfHogDescriptors(wrinkleArea); //sumowanie wartosci z histogramow
         }
         if (Float.isNaN(wrinkleFactor)) {
             throw new WrinkleFeaturesException("NaN");
         }
         return wrinkleFactor;
+    }
+
+    private float[] calculateWrinkleFeaturesFromHogKNN() {
+        float[] wrinkleFactors = new float[5];
+        createWrinkleAreas();
+        float wrinkleFactor = 0;
+        return wrinkleFactors;
     }
 
     private float calculateSumOfHogDescriptors(Rect wrinkleArea) throws WrinkleFeaturesException {
@@ -178,7 +190,7 @@ public class WrinkleFeatureCalculator {
         hog.compute(wrinkleAreaMat, descriptors);
         float wrinkleFactor = 0;
         try {
-            for (float i : descriptors.toArray()) {
+            for (float i : descriptors.toArray()) { //sumowanie wartości z histogramów
                 wrinkleFactor += i;
             }
         } catch (RuntimeException e) {

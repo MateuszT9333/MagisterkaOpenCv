@@ -4,6 +4,7 @@ public class HogConfig {
     private boolean isHog;
     private double cellSizeInPx = 3;
     private int nbins = 9;
+    private boolean isHogKnn = false;
 
     public HogConfig(boolean isHog) {
         this.isHog = isHog;
@@ -18,10 +19,11 @@ public class HogConfig {
                 '}';
     }
 
-    public HogConfig(boolean isHog, double cellSizeInPx, int nbins) {
+    public HogConfig(boolean isHog, double cellSizeInPx, int nbins, boolean isHogKnn) {
         this.isHog = isHog;
         this.cellSizeInPx = cellSizeInPx;
         this.nbins = nbins;
+        this.isHogKnn = isHogKnn;
     }
 
     public boolean isHog() {
@@ -46,5 +48,13 @@ public class HogConfig {
 
     public void setNbins(int nbins) {
         this.nbins = nbins;
+    }
+
+    public boolean isHogKnn() {
+        return isHogKnn;
+    }
+
+    public void setHogKnn(boolean hogKnn) {
+        isHogKnn = hogKnn;
     }
 }

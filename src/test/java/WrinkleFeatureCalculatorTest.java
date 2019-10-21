@@ -32,8 +32,8 @@ public class WrinkleFeatureCalculatorTest {
     }
 
     private final File processedImage = MOJATWARZ;
-    boolean originalRectangles = false;
-    final static HogConfig hogConfig = new HogConfig(true, 9, 9);
+    boolean originalRectangles = true;
+    final static HogConfig hogConfig = new HogConfig(false, 9, 9);
 
     private static void exportImgFeatures(Mat grayMat) {
 
