@@ -76,6 +76,16 @@ public class WrinkleFeatureCalculator {
 
     }
 
+    /**
+     * Przyciecie tylko do ryja
+     *
+     * @param path
+     */
+    public WrinkleFeatureCalculator(File path) throws WrinkleFeaturesException {
+        processedMat = Imgcodecs.imread(path.getAbsolutePath());
+        grayProcessedMat = faceDetector(processedMat);
+        grayProcessedMat.
+    }
     private void WrinkleFeatureCalculatorWithHog() throws WrinkleFeaturesException {
         grayProcessedMat = faceDetector(processedMat);
         croppedToFace = cropToFace(grayProcessedMat);
