@@ -27,10 +27,11 @@ import java.util.List;
 public class Trainer {
 
     final static HogConfig hogConfig = new HogConfig(true, 9, 9, true);
+    static boolean originalRectangles = false; //true - method from document, false - without area between eyes
+
     private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static final Logger heapLog = LogManager.getLogger("heap");
-    static boolean originalRectangles = false; //true - method from document, false - without area between eyes
     private static FileProduct clusteredJson;
 
     public static void generateDataFromImages(String trainingSetPrefix, File imagesPath, boolean cropOnlyToFace) {
