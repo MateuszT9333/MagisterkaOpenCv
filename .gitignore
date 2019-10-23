@@ -1,0 +1,6 @@
+/hs_err_*.log
+/replay_*.log
+/.idea/
+/libs/
+/target/
+/src/resources/utils/null.jpg
