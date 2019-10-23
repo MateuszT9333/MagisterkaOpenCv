@@ -4,5 +4,6 @@ public enum FileType {
     ageToWrinkleJson,
     clusteredJson,
     mergedJson,
-    matlabDat
+    matlabDat,
+    matlabDatHogKnn
 }

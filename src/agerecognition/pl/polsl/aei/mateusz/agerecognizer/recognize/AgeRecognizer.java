@@ -21,7 +21,7 @@ public class AgeRecognizer {
 
 
     private static boolean originalRectangles = false;
-    private final static HogConfig hogConfig = new HogConfig(true, 9, 9);
+    private final static HogConfig hogConfig = new HogConfig(true, 9, 9, false);
     private static String trainingTitle = "Original method: " + originalRectangles + ", options = [2.0 1000 1e-5 1];\n" +
             "numberOfClusters = 100, " + hogConfig.isHog();
 

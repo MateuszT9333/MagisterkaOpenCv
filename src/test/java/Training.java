@@ -14,15 +14,15 @@ public class Training {
 
     @Test
     public void generateDataFromImagesManual() {
-        Trainer.generateDataFromImages("1", null);
+        Trainer.generateDataFromImages("1", null, false);
     }
 
     @Test
     public void generateDataFromImagesAuto() throws InterruptedException {
         boolean process = false;
         long startTime = System.currentTimeMillis();
-        File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
-        String startFrom = "40";
+        File images = new File(propertiesLoader.getProperty("croppedImagesPath"));
+        String startFrom = "00";
         try {
             for (File imagePath : Objects.requireNonNull(images.listFiles())) {
 
@@ -34,7 +34,7 @@ public class Training {
                     continue;
                 }
 
-                Trainer.generateDataFromImages("3", imagePath);
+                Trainer.generateDataFromImages("10", imagePath, false);
                 Thread.sleep(1000);
 //            if(System.currentTimeMillis() - startTime > 180000){
 //                System.exit(0);
@@ -47,8 +47,41 @@ public class Training {
     }
 
     @Test
+    public void cropFacesFromImagesAuto() throws InterruptedException {
+        boolean process = false;
+        long startTime = System.currentTimeMillis();
+        File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
+        String startFrom = "38";
+        try {
+            for (File imagePath : Objects.requireNonNull(images.listFiles())) {
+
+                if (imagePath.getName().contains(startFrom)) {
+                    process = true;
+                }
+
+                if (!process) {
+                    continue;
+                }
+
+                Trainer.generateDataFromImages("3", imagePath, true);
+                Thread.sleep(1000);
+//            if(System.currentTimeMillis() - startTime > 180000){
+//                System.exit(0);
+//                log.warn("Stop after 180 seconds");
+//            }
+            }
+        } catch (RuntimeException e) {
+            System.exit(0);
+        }
+    }
+    @Test
     public void mergeAgeToWrinkleFeatureJson() {
-        Trainer.mergeAgeToWrinkleFeaturesFromJsons("2");
+        Trainer.mergeAgeToWrinkleFeaturesFromJsons("10");
+    }
+
+    @Test
+    public void mergeAgeToWrinkleFeatureJsonHogKnn() {
+        Trainer.mergeAgeToWrinkleFeaturesFromJsonsHogKnn("10");
     }
 
     @Test

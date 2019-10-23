@@ -187,6 +187,14 @@ public class WrinkleFeatureCalculatorTest {
         exportImgFeatures(grayMat);
     }
 
+    @Test
+    public void cropToFaceTest() throws WrinkleFeaturesException {
+        WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
+        String testFile = "E:\\Workspace\\Studia\\MagisterkaInfa\\AgeRecognizer\\rozpoznaj_wiek" +
+                "\\15_0_0_20170110224312647.jpg";
+        wrinkleFeatureCalculator = new WrinkleFeatureCalculator(new File(testFile));
+    }
+
 //    @Test
 //    public void fileExists(File processedImage) {
 //        File file = processedImage;

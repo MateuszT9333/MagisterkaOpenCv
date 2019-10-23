@@ -12,6 +12,8 @@ public class FileFactory {
                 return new MergedJsonFile();
             case matlabDat:
                 return new MatlabDatFile();
+            case matlabDatHogKnn:
+                return new MatlabDatFileHogKnn();
             default:
                 throw new RuntimeException("Invalid FileType");
         }

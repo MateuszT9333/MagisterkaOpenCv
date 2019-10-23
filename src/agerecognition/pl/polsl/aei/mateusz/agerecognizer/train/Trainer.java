@@ -13,6 +13,7 @@ import pl.polsl.aei.mateusz.agerecognizer.files.FileType;
 import pl.polsl.aei.mateusz.agerecognizer.utils.HogConfig;
 import pl.polsl.aei.mateusz.agerecognizer.utils.PropertiesLoader;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.AgeToWrinkleFeature;
+import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.AgeToWrinkleFeatureHogKnn;
 import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculator;
 
 import java.io.BufferedReader;
@@ -20,18 +21,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Trainer {
 
-    final static HogConfig hogConfig = new HogConfig(true, 9, 9);
+    final static HogConfig hogConfig = new HogConfig(true, 9, 9, true);
     private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
     private static final Logger heapLog = LogManager.getLogger("heap");
     static boolean originalRectangles = false; //true - method from document, false - without area between eyes
     private static FileProduct clusteredJson;
 
-    public static void generateDataFromImages(String trainingSetPrefix, File imagesPath) {
+    public static void generateDataFromImages(String trainingSetPrefix, File imagesPath, boolean cropOnlyToFace) {
         long startTime = System.currentTimeMillis();
         int invalidProcessedImages = 0;
         int validProcessedImages = 0;
@@ -53,7 +55,11 @@ public class Trainer {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 //            heapLog.info("Heap size in %: " + r.totalMemory() * 100 / r.maxMemory());
             try {
-                wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, false, originalRectangles, hogConfig);
+                if (!cropOnlyToFace) {
+                    wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, true, originalRectangles, hogConfig);
+                } else {
+                    wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image);
+                }
             } catch (WrinkleFeaturesException e) {
                 invalidProcessedImages++;
                 String wrinkleFeatureExceptionMessage = e.getMessage();
@@ -66,17 +72,24 @@ public class Trainer {
                 continue;
             } catch (Exception e) {
                 invalidProcessedImages++;
-                String exceptionMessage = "Exception: Path: " + image.getName();
+                String exceptionMessage = "Exception: Path: " + image.getAbsolutePath();
                 log.error(exceptionMessage);
                 continue;
             }
             //Succesfully processed wrinkle feature
             validProcessedImages++;
             float wrinkleFeatureResult = wrinkleFeatureCalculator.getWrinkleFeatures();
+            float[] wrinkleFeaturesFromHogKnn = wrinkleFeatureCalculator.getWrinkleFeaturesKNN();
             byte age = getAgeFromPath(image.getName());
-            ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult, image.getName())); //write result to file
-
-            log.info(String.format("Success!: Path: %s: (age: %d | feature: %f)", image.getName(), age, wrinkleFeatureResult));
+            if (hogConfig.isHogKnn()) {
+                ageToWrinkleJson.writeln(new AgeToWrinkleFeatureHogKnn(age, wrinkleFeaturesFromHogKnn,
+                        image.getName()));
+                log.info(String.format("Success!: Path: %s: (age: %d | feature: %s)", image.getName(), age,
+                        Arrays.toString(wrinkleFeaturesFromHogKnn)));
+            } else {
+                ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult, image.getName())); //write result to file
+                log.info(String.format("Success!: Path: %s: (age: %d | feature: %f)", image.getName(), age, wrinkleFeatureResult));
+            }
         }
         generateStats(startTime, invalidProcessedImages, validProcessedImages);
     }
@@ -175,4 +188,28 @@ public class Trainer {
         }
     }
 
+    public static void mergeAgeToWrinkleFeaturesFromJsonsHogKnn(String trainingSetPath) {
+        FileProduct mergedJson = FileFactory.create(FileType.mergedJson);
+        FileProduct matlabDatHogKnn = FileFactory.create(FileType.matlabDatHogKnn);
+        mergedJson.createFileWithSuffix(trainingSetPath);
+        matlabDatHogKnn.createFileWithSuffix(trainingSetPath);
+
+        File file = new File(propertiesLoader.getProperty("pathToData"));
+
+        File[] listOfFiles = file.listFiles(pathname -> pathname.getName()
+                .contains("ageToWrinkleFeaturesJson" + trainingSetPath));
+        assert listOfFiles != null;
+        for (File json : listOfFiles) {
+
+            try (BufferedReader br = new BufferedReader(new FileReader(json))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    mergedJson.writeln(line);
+                    matlabDatHogKnn.writeln(line);
+                }
+            } catch (IOException e) {
+                log.catching(e);
+            }
+        }
+    }
 }
