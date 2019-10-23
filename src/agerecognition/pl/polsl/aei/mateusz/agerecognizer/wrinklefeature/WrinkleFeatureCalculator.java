@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.HOGDescriptor;
 import org.opencv.objdetect.Objdetect;
@@ -93,12 +94,20 @@ public class WrinkleFeatureCalculator {
         Imgcodecs.imwrite(filename, croppedToFace);
     }
     private void WrinkleFeatureCalculatorWithHog() throws WrinkleFeaturesException {
+        croppedToFace = resize(croppedToFace, 1.5); //todo kiedy zmianiac rozmiar?
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
         if (this.hogConfig.isHogKnn()) {
             wrinkleFeaturesKNN = calculateWrinkleFeaturesFromHogKNN();
         } else {
             wrinkleFeatures = calculateWrinkleFeaturesFromHog();
         }
+    }
+
+    private Mat resize(Mat croppedToFace, double factor) {
+        Mat resizedImage = new Mat();
+        Size size = new Size(croppedToFace.width() * factor, croppedToFace.height() * factor);
+        Imgproc.resize(croppedToFace, resizedImage, size);
+        return resizedImage;
     }
 
     private void WrinkleFeatureCalculatorFromCroppedFace() throws WrinkleFeaturesException {
