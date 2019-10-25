@@ -13,6 +13,7 @@ import pl.polsl.aei.mateusz.agerecognizer.wrinklefeature.WrinkleFeatureCalculato
 
 import javax.swing.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -32,8 +33,8 @@ public class WrinkleFeatureCalculatorTest {
     }
 
     private final File processedImage = MOJATWARZ;
-    boolean originalRectangles = true;
-    final static HogConfig hogConfig = new HogConfig(true, 9, 9, true);
+    boolean originalRectangles = false;
+    final static HogConfig hogConfig = new HogConfig(false, 9, 9, false);
 
     private static void exportImgFeatures(Mat grayMat) {
 
@@ -145,24 +146,39 @@ public class WrinkleFeatureCalculatorTest {
 
     @Test
     public void calculateWrinkleFeaturesTest() {
+        File TEST = new File(propertiesLoader.getProperty("test"));
+        File MOJATWARZ = new File(propertiesLoader.getProperty("mojaTwarz"));
+        File MAT = new File(propertiesLoader.getProperty("matImage"));
+        File processedImage = TEST;
+        boolean originalRectangles = false;
+        HogConfig hogConfig = new HogConfig(true, 9, 9, true);
+
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, true, originalRectangles, hogConfig);
         } catch (WrinkleFeaturesException e) {
             log.catching(e);
         }
         assert wrinkleFeatureCalculator != null;
 //        wrinkleFeatureCalculator.showWrinkleAreas(new Scalar(0, 0, 0));
         log.info("Wrinkle features " + wrinkleFeatureCalculator.getWrinkleFeatures());
+        log.info("Wrinkle features KNN" + Arrays.toString(wrinkleFeatureCalculator.getWrinkleFeaturesKNN()));
         pause();
     }
 
     @Test
     public void showGeneratedImages() {
+        File TEST = new File(propertiesLoader.getProperty("test"));
+        File MOJATWARZ = new File(propertiesLoader.getProperty("mojaTwarz"));
+        File MAT = new File(propertiesLoader.getProperty("matImage"));
+        File processedImage = TEST;
+        boolean originalRectangles = true;
+        HogConfig hogConfig = new HogConfig(false, 9, 9, false);
         WrinkleFeatureCalculator wrinkleFeatureCalculator = null;
         //fileExists(processedImage);
         try {
-            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, false, originalRectangles, hogConfig);
+            wrinkleFeatureCalculator = new WrinkleFeatureCalculator(processedImage, true, originalRectangles,
+                    hogConfig);
         } catch (Throwable e) {
             log.catching(e);
         }

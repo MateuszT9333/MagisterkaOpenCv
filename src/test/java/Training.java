@@ -34,7 +34,7 @@ public class Training {
                     continue;
                 }
 
-                Trainer.generateDataFromImages("10", imagePath, false);
+                Trainer.generateDataFromImages("99", imagePath, false);
                 Thread.sleep(1000);
 //            if(System.currentTimeMillis() - startTime > 180000){
 //                System.exit(0);
@@ -46,34 +46,34 @@ public class Training {
         }
     }
 
-    @Test
-    public void cropFacesFromImagesAuto() throws InterruptedException {
-        boolean process = false;
-        long startTime = System.currentTimeMillis();
-        File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
-        String startFrom = "38";
-        try {
-            for (File imagePath : Objects.requireNonNull(images.listFiles())) {
-
-                if (imagePath.getName().contains(startFrom)) {
-                    process = true;
-                }
-
-                if (!process) {
-                    continue;
-                }
-
-                Trainer.generateDataFromImages("3", imagePath, true);
-                Thread.sleep(1000);
-//            if(System.currentTimeMillis() - startTime > 180000){
-//                System.exit(0);
-//                log.warn("Stop after 180 seconds");
+    //    @Test
+//    public void cropFacesFromImagesAuto() throws InterruptedException {
+//        boolean process = false;
+//        long startTime = System.currentTimeMillis();
+//        File images = new File(propertiesLoader.getProperty("trainingImagesPath"));
+//        String startFrom = "21";
+//        try {
+//            for (File imagePath : Objects.requireNonNull(images.listFiles())) {
+//
+//                if (imagePath.getName().contains(startFrom)) {
+//                    process = true;
+//                }
+//
+//                if (!process) {
+//                    continue;
+//                }
+//
+//                Trainer.generateDataFromImages("3", imagePath, false);
+//                Thread.sleep(1000);
+////            if(System.currentTimeMillis() - startTime > 180000){
+////                System.exit(0);
+////                log.warn("Stop after 180 seconds");
+////            }
 //            }
-            }
-        } catch (RuntimeException e) {
-            System.exit(0);
-        }
-    }
+//        } catch (RuntimeException e) {
+//            System.exit(0);
+//        }
+//    }
     @Test
     public void mergeAgeToWrinkleFeatureJson() {
         Trainer.mergeAgeToWrinkleFeaturesFromJsons("10");

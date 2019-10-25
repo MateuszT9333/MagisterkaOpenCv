@@ -28,6 +28,7 @@ public class Trainer {
 
     final static HogConfig hogConfig = new HogConfig(true, 9, 9, true);
     static boolean originalRectangles = false; //true - method from document, false - without area between eyes
+    static boolean isCroppedToFace = false; //true - method from document, false - without area between eyes
 
     private static final Logger log = LogManager.getLogger("main");
     private static final PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
@@ -52,12 +53,14 @@ public class Trainer {
         int integerCounter = AgeToWrinkleJsonFile.nextIntegerCounter(); //next integer counter in suffix of file name
         String suffixOfFile = String.format("%s_%d", trainingSetPrefix, integerCounter);
         ageToWrinkleJson.createFileWithSuffix(suffixOfFile);
+
         for (File image : imagesInDir) {
             WrinkleFeatureCalculator wrinkleFeatureCalculator;
 //            heapLog.info("Heap size in %: " + r.totalMemory() * 100 / r.maxMemory());
             try {
                 if (!cropOnlyToFace) {
-                    wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, true, originalRectangles, hogConfig);
+                    wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image, isCroppedToFace, originalRectangles,
+                            hogConfig);
                 } else {
                     wrinkleFeatureCalculator = new WrinkleFeatureCalculator(image);
                 }
@@ -91,6 +94,8 @@ public class Trainer {
                 ageToWrinkleJson.writeln(new AgeToWrinkleFeature(age, wrinkleFeatureResult, image.getName())); //write result to file
                 log.info(String.format("Success!: Path: %s: (age: %d | feature: %f)", image.getName(), age, wrinkleFeatureResult));
             }
+            log.info("Detected objects " + wrinkleFeatureCalculator.getDetectedObjects());
+            log.info("Wrinkle areas " + wrinkleFeatureCalculator.getWrinkleAreas());
         }
         generateStats(startTime, invalidProcessedImages, validProcessedImages);
     }

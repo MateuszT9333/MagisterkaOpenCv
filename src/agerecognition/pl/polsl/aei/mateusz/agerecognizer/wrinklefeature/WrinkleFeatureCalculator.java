@@ -94,7 +94,7 @@ public class WrinkleFeatureCalculator {
         Imgcodecs.imwrite(filename, croppedToFace);
     }
     private void WrinkleFeatureCalculatorWithHog() throws WrinkleFeaturesException {
-        croppedToFace = resize(croppedToFace, 1.5); //todo kiedy zmianiac rozmiar?
+        croppedToFace = resize(croppedToFace, 1.0);
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
         if (this.hogConfig.isHogKnn()) {
             wrinkleFeaturesKNN = calculateWrinkleFeaturesFromHogKNN();
@@ -111,10 +111,11 @@ public class WrinkleFeatureCalculator {
     }
 
     private void WrinkleFeatureCalculatorFromCroppedFace() throws WrinkleFeaturesException {
+        processedMat = resize(processedMat, 1.0);
         ImageProcessing.makeGrayImage(processedMat);
         croppedToFace = processedMat;
         detectedNoseAndEyes = detectPairOfEyesAndNose(croppedToFace);
-        calculateWrinkleFeatures();
+        wrinkleFeatures = calculateWrinkleFeatures();
     }
 
     /**
