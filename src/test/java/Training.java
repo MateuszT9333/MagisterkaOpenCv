@@ -81,7 +81,7 @@ public class Training {
 
     @Test
     public void mergeAgeToWrinkleFeatureJsonHogKnn() {
-        Trainer.mergeAgeToWrinkleFeaturesFromJsonsHogKnn("10");
+        Trainer.mergeAgeToWrinkleFeaturesFromJsonsHogKnn("99");
     }
 
     @Test
