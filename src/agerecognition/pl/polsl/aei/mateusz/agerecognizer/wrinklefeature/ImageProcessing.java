@@ -146,7 +146,7 @@ public class ImageProcessing {
 
     static Mat detectEdges(Mat source) {
         Mat destination = source.clone();
-        Imgproc.Canny(source, destination, 10, 100);
+        Imgproc.Canny(source, destination, 0.01, 70);
         return destination;
     }
 
